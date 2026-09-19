@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAPI-SULTRA — Intelligence Keuangan Berbasis AI</title>
+  <meta name="description"
+    content="Transformasi jejak transaksi UMKM menjadi catatan keuangan terstruktur dan Profil Kesiapan Pembiayaan RAPI berbasis AI." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script type="module" crossorigin src="/assets/index-Bun_CclV.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CzT2Yl6F.css">
+</head>
+
+<body>
+  <div id="app">
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="logo-icon">
+            <span class="logo-r">R</span><span class="logo-a">A</span><span class="logo-p">P</span><span
+              class="logo-i">I</span>
+          </div>
+          <div class="logo-text">
+            <h1>RAPI-SULTRA</h1>
+            <p>Intelligence Keuangan Berbasis AI</p>
+          </div>
+        </div>
+        <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#overview" class="nav-item active" data-page="overview">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect x="2" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5" />
+            <rect x="11" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5" />
+            <rect x="2" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5" />
+            <rect x="11" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+          <span>Ikhtisar</span>
+        </a>
+        <a href="#transactions" class="nav-item" data-page="transactions">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M3 4h14M3 8h14M3 12h10M3 16h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+          <span>Transaksi</span>
+        </a>
+        <a href="#review" class="nav-item" data-page="review">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2L12.5 7.5H18L13.5 11L15.5 17L10 13.5L4.5 17L6.5 11L2 7.5H7.5L10 2Z" stroke="currentColor"
+              stroke-width="1.5" stroke-linejoin="round" />
+          </svg>
+          <span>Pusat Review</span>
+          <span id="review-badge" class="nav-badge hidden">0</span>
+        </a>
+        <a href="#financial" class="nav-item" data-page="financial">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M2 17V8l4-3 4 3 4-5 4 5v12H2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+          </svg>
+          <span>Profil Keuangan</span>
+        </a>
+        <a href="#rapi" class="nav-item" data-page="rapi">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5" />
+            <path d="M10 5v5l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+          <span>Profil RAPI</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="simulation-badge">
+          <div>
+            <span class="sim-label">Demo UMKM</span>
+            <span class="sim-sub">Mode Simulasi</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <main id="main-content" class="main-content">
+      <!-- Pages rendered here -->
+    </main>
+    <div id="drawer-overlay" class="drawer-overlay hidden"></div>
+    <div id="drawer" class="drawer hidden">
+      <div id="drawer-content"></div>
+    </div>
+    <div id="modal-overlay" class="modal-overlay hidden"></div>
+    <div id="modal" class="modal hidden">
+      <div id="modal-content"></div>
+    </div>
+    <div id="toast-container" class="toast-container"></div>
+    <div id="loading-overlay" class="loading-overlay hidden">
+      <div id="loading-content" class="loading-content"></div>
+    </div>
+  </div>
+</body>
+
+</html>
