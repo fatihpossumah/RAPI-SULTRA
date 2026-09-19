@@ -1,0 +1,61 @@
+description,channel,direction,amount,label
+koreksi db,QRIS,OUT,4725804.0,Other
+titipan bayar barang,Cash,IN,1197643.0,Revenue
+angsuran bulanan bri,QRIS,IN,4632571.0,Financing
+tebus invoice barang,QRIS,OUT,863982.0,COGS
+pindah buku ke rek op,Transfer,IN,670958.0,Transfer_Internal
+salah transfer kembalikan,QRIS,OUT,2123643.0,Other
+dp catering bpk budi,Invoice,OUT,4890143.0,Revenue
+upah tukang angkut,Transfer,IN,700275.0,Operating_Expense
+belanja kardus & plastik paking,Cash,IN,42429.0,COGS
+trx shopeepay,QRIS,IN,1158273.0,Revenue
+koreksi cr,Transfer,IN,133684.0,Other
+penerimaan hadiah,Transfer,IN,4881268.0,Other
+pelunasan po 12,Bank_Mutation,IN,650673.0,Revenue
+pindah dana operasional,Bank_Mutation,IN,1415964.0,Transfer_Internal
+bayar pinjaman,Invoice,IN,4281275.0,Financing
+pembelian perlengkapan toko,Bank_Mutation,OUT,1628171.0,Operating_Expense
+pembayaran utang ke pt abc,Transfer,OUT,2433349.0,Financing
+pencairan pinjaman,Transfer,OUT,4039410.0,Financing
+beli sapu dan pel,QRIS,OUT,2689482.0,Operating_Expense
+restock etalase dpn,Bank_Mutation,OUT,1002200.0,COGS
+sweep in,Transfer,IN,1025951.0,Transfer_Internal
+trf rek cadangan,Cash,IN,4645801.0,Transfer_Internal
+nota 991 brg msk,Bank_Mutation,OUT,2115390.0,COGS
+bayar sayur pasar,Transfer,OUT,1707850.0,COGS
+terima kta,QRIS,OUT,4996420.0,Financing
+mutasi internal,Transfer,IN,4449666.0,Transfer_Internal
+service motor kurir,Bank_Mutation,IN,4353888.0,Operating_Expense
+nota bengkel service ac,Invoice,OUT,706755.0,Operating_Expense
+potongan angsuran,Transfer,OUT,4843860.0,Financing
+kas ke bank,Cash,IN,3361734.0,Transfer_Internal
+hasil harian,Transfer,OUT,3778773.0,Revenue
+reversal trx,Transfer,OUT,1317157.0,Other
+pajak bunga,Bank_Mutation,OUT,2154636.0,Other
+saldo tdk terpakai,Invoice,OUT,4104477.0,Other
+kredit rekening koran,Bank_Mutation,OUT,314178.0,Financing
+gaji karyawan mingguan,Bank_Mutation,IN,2650281.0,Operating_Expense
+invoice 001 dibayar,Cash,IN,2592703.0,Revenue
+pengembalian dana batal,Transfer,OUT,3938999.0,Other
+nota no 221 pakan ternak,Transfer,OUT,238664.0,COGS
+penjualan,QRIS,IN,329489.0,Revenue
+pembelian alat kerja produksi,Cash,OUT,4037570.0,COGS
+tarik saldo shopee,Bank_Mutation,IN,3062272.0,Transfer_Internal
+pembayaran pesanan,QRIS,IN,2448142.0,Revenue
+kulakan,QRIS,OUT,492615.0,COGS
+bayar makan meja 4,QRIS,IN,4528046.0,Revenue
+angsuran modal kerja,Transfer,OUT,4926691.0,Financing
+bayar listrik 3bln,Cash,OUT,340281.0,Operating_Expense
+pembelian kemasan,Bank_Mutation,IN,1814559.0,COGS
+saldo mengendap,Cash,OUT,2064449.0,Other
+bonus saldo bca,Cash,OUT,1674447.0,Other
+sewa ruko tahunan,QRIS,OUT,808310.0,Operating_Expense
+pemindahan dana antar rekening sendiri,QRIS,OUT,409756.0,Transfer_Internal
+kredit investasi,Cash,OUT,2340453.0,Financing
+beli token,Invoice,IN,2003009.0,Operating_Expense
+angsuran pokok,Transfer,OUT,3298324.0,Financing
+wd dari mesin edc,Transfer,IN,1577777.0,Transfer_Internal
+dr bu ani,Bank_Mutation,OUT,437411.0,Revenue
+top up ovo,Cash,OUT,4397559.0,Transfer_Internal
+cetak spanduk depan,Cash,OUT,2274081.0,Operating_Expense
+barang dagangan dr distributor,Invoice,OUT,1472960.0,COGS

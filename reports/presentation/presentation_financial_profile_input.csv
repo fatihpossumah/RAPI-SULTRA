@@ -1,0 +1,2 @@
+total_revenue,average_monthly_revenue,revenue_std,revenue_min,revenue_max,total_cogs,total_operating_expense,average_monthly_cash_flow,total_financing_inflow,total_financing_outflow,transaction_count,active_months,review_rate,duplicate_rate,reconciled_rate,information_completeness_input
+17250000.0,2875000.0,1164044.6726822816,1850000.0,4350000.0,27050000.0,11700000.0,3433333.3333333335,25000000.0,6000000.0,97,6,22.30769230769231,2.307692307692308,0.7692307692307693,100.0

@@ -1,0 +1,18 @@
+dimension,status,data_sufficiency,metric,value,interpretation
+revenue_stability,MODERATE_VARIABILITY,SUFFICIENT,active_months,6.0,Pendapatan teramati selama 6 bulan aktif dengan status MODERATE_VARIABILITY. Ini adalah proksi deskriptif dan tidak menjamin stabilitas pendapatan di masa depan.
+revenue_stability,MODERATE_VARIABILITY,SUFFICIENT,average_monthly_revenue,2875000.0,Pendapatan teramati selama 6 bulan aktif dengan status MODERATE_VARIABILITY. Ini adalah proksi deskriptif dan tidak menjamin stabilitas pendapatan di masa depan.
+revenue_stability,MODERATE_VARIABILITY,SUFFICIENT,minimum_monthly_revenue,1850000.0,Pendapatan teramati selama 6 bulan aktif dengan status MODERATE_VARIABILITY. Ini adalah proksi deskriptif dan tidak menjamin stabilitas pendapatan di masa depan.
+revenue_stability,MODERATE_VARIABILITY,SUFFICIENT,maximum_monthly_revenue,4350000.0,Pendapatan teramati selama 6 bulan aktif dengan status MODERATE_VARIABILITY. Ini adalah proksi deskriptif dan tidak menjamin stabilitas pendapatan di masa depan.
+revenue_stability,MODERATE_VARIABILITY,SUFFICIENT,coefficient_of_variation,0.4048851035416632,Pendapatan teramati selama 6 bulan aktif dengan status MODERATE_VARIABILITY. Ini adalah proksi deskriptif dan tidak menjamin stabilitas pendapatan di masa depan.
+cash_flow_consistency,MODERATELY_POSITIVE,SUFFICIENT,observed_months,6.0,Pergerakan kas bersih bernilai positif pada 4 dari total 6 bulan yang teramati.
+cash_flow_consistency,MODERATELY_POSITIVE,SUFFICIENT,positive_months,4.0,Pergerakan kas bersih bernilai positif pada 4 dari total 6 bulan yang teramati.
+cash_flow_consistency,MODERATELY_POSITIVE,SUFFICIENT,negative_months,2.0,Pergerakan kas bersih bernilai positif pada 4 dari total 6 bulan yang teramati.
+cash_flow_consistency,MODERATELY_POSITIVE,SUFFICIENT,average_monthly_net_cash_movement,3433333.333333333,Pergerakan kas bersih bernilai positif pada 4 dari total 6 bulan yang teramati.
+payment_behaviour,OBSERVED_PAYMENT_ACTIVITY,LIMITED,months_with_payment,5.0,Terdapat pengeluaran pembiayaan yang teramati selama 5 bulan.
+payment_behaviour,OBSERVED_PAYMENT_ACTIVITY,LIMITED,total_financing_outflow_observed,6000000.0,Terdapat pengeluaran pembiayaan yang teramati selama 5 bulan.
+information_completeness,HIGHLY_COMPLETE,SUFFICIENT,overall_completeness_rate,100.0,"Dataset memiliki tingkat kelengkapan atribut keseluruhan sebesar 100.0%. Ini hanya mengukur keberadaan data, bukan kualitas kredit."
+information_completeness,HIGHLY_COMPLETE,SUFFICIENT,transaction_count,97.0,"Dataset memiliki tingkat kelengkapan atribut keseluruhan sebesar 100.0%. Ini hanya mengukur keberadaan data, bukan kualitas kredit."
+information_completeness,HIGHLY_COMPLETE,SUFFICIENT,complete_transaction_count,97.0,"Dataset memiliki tingkat kelengkapan atribut keseluruhan sebesar 100.0%. Ini hanya mengukur keberadaan data, bukan kualitas kredit."
+information_completeness,HIGHLY_COMPLETE,SUFFICIENT,review_required_count,29.0,"Dataset memiliki tingkat kelengkapan atribut keseluruhan sebesar 100.0%. Ini hanya mengukur keberadaan data, bukan kualitas kredit."
+information_completeness,HIGHLY_COMPLETE,SUFFICIENT,reconciled_count,1.0,"Dataset memiliki tingkat kelengkapan atribut keseluruhan sebesar 100.0%. Ini hanya mengukur keberadaan data, bukan kualitas kredit."
+information_completeness,HIGHLY_COMPLETE,SUFFICIENT,duplicate_candidate_count,3.0,"Dataset memiliki tingkat kelengkapan atribut keseluruhan sebesar 100.0%. Ini hanya mengukur keberadaan data, bukan kualitas kredit."

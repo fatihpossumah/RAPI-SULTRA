@@ -1,0 +1,3 @@
+raw_transaction_id,reconciliation_status,reconciliation_reason,reconciliation_confidence,reconciliation_group_id,date,channel,amount,description
+dd0137bd-9e8c-4ff3-b2b6-f32bf5f3296c,RECONCILED,reference_match,HIGH,26bb9833-8a1f-4b86-912c-dfe2fef0661e,2026-06-05,QRIS,350000,Pembayaran Toko
+1f34d996-2f41-4aeb-b60f-71248becd526,RECONCILED,reference_match,HIGH,26bb9833-8a1f-4b86-912c-dfe2fef0661e,2026-06-06,Bank_Mutation,350000,Settlement QRIS

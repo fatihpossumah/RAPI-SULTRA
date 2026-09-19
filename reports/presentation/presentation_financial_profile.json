@@ -1,0 +1,41 @@
+{
+    "profile_metadata": {
+        "period_start": "2026-01",
+        "period_end": "2026-06",
+        "source": "RAPI-SULTRA PoC - Financial Engine Output"
+    },
+    "revenue_stability": {
+        "active_months": 6,
+        "average_monthly_revenue": 2875000.0,
+        "minimum_monthly_revenue": 1850000.0,
+        "maximum_monthly_revenue": 4350000.0,
+        "coefficient_of_variation": 0.4048851035416632,
+        "status": "MODERATE_VARIABILITY",
+        "explanation": "Moderate revenue variability (CV = 0.40)."
+    },
+    "cash_flow_consistency": {
+        "average_monthly_net_cash_movement": 3433333.333333333,
+        "positive_months": 4,
+        "negative_months": 2,
+        "status": "MODERATELY_POSITIVE",
+        "explanation": "67% of observed months have positive net cash movement."
+    },
+    "payment_behaviour": {
+        "status": "OBSERVED_PAYMENTS",
+        "observed_metrics": {
+            "months_with_payment": 5,
+            "total_financing_outflow_observed": 6000000.0
+        },
+        "explanation": "Observed financing outflow in 5 out of 6 active months. This is a proxy indicator, not a validated creditworthiness score."
+    },
+    "information_completeness": {
+        "overall_completeness_rate": 100.0,
+        "transaction_count": 97,
+        "complete_transaction_count": 97,
+        "review_required_count": 29,
+        "reconciled_count": 1,
+        "duplicate_candidate_count": 3,
+        "status": "HIGHLY_COMPLETE",
+        "explanation": "Information completeness rate is 100.0%. This evaluates the presence of core transaction attributes."
+    }
+}

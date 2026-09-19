@@ -1,0 +1,13 @@
+date,channel,direction,description,amount,reference_id
+2026-11-01,Transfer,OUT,pembelian bahan baku supplier ayam,350000,REF101
+2026-11-02,Cash,OUT,belanja perlengkapan toko,150000,REF102
+2026-11-03,QRIS,IN,pembayaran pesanan 099,85000,REF103
+2026-11-04,Bank_Mutation,OUT,angsuran pokok pinjaman bri,2000000,REF104
+2026-11-05,Transfer,OUT,trf ke rek istri untuk kas harian,500000,REF105
+2026-11-06,Transfer,IN,salah transfer dr bpk joko,150000,REF106
+2026-11-07,Transfer,OUT,bayar tagihan sewa bulanan,1200000,REF107
+2026-11-08,Invoice,IN,pelunasan po pt sukses maju,5000000,REF108
+2026-11-09,Bank_Mutation,IN,kode transaksi 9901,10000,REF109
+2026-11-10,Transfer,OUT,bayar listrik dan air,300000,REF110
+2026-11-11,Cash,OUT,beli kardus kemasan,20000,REF111
+2026-11-12,QRIS,IN,trx 91280,25000,REF112

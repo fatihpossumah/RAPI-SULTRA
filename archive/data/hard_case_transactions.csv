@@ -1,0 +1,121 @@
+description,channel,direction,amount,label
+pembelian bahan baku utama,QRIS,OUT,1382396.0,COGS
+beli stok krupuk,Transfer,OUT,521451.0,COGS
+nota 991 brg msk,Bank_Mutation,OUT,2115390.0,COGS
+tebus sembako dr agen,QRIS,OUT,1170978.0,COGS
+restock etalase dpn,Bank_Mutation,OUT,1002200.0,COGS
+pembayaran suplier pt makmur,Bank_Mutation,OUT,2251553.0,COGS
+belanja kardus & plastik paking,Cash,IN,42429.0,COGS
+bayar sayur pasar,Transfer,OUT,1707850.0,COGS
+bahan adonan,Transfer,OUT,3819836.0,COGS
+kulakan,QRIS,OUT,492615.0,COGS
+pembelian alat kerja produksi,Cash,OUT,4037570.0,COGS
+beli ayam 10kg,Invoice,OUT,4865848.0,COGS
+barang dagangan dr distributor,Invoice,OUT,1472960.0,COGS
+pembelian kemasan,Bank_Mutation,IN,1814559.0,COGS
+nota no 221 pakan ternak,Transfer,OUT,238664.0,COGS
+bayar faktur supplier beras,Transfer,OUT,4926255.0,COGS
+bahan pokok,Transfer,IN,1906830.0,COGS
+pembelian benang & kain,Invoice,OUT,1830513.0,COGS
+restock gudang,Cash,OUT,3354174.0,COGS
+tebus invoice barang,QRIS,OUT,863982.0,COGS
+pembelian ATK,Transfer,OUT,1903483.0,Operating_Expense
+pembelian perlengkapan toko,Bank_Mutation,OUT,1628171.0,Operating_Expense
+cicilan kendaraan operasional,QRIS,OUT,170180.0,Operating_Expense
+bayar listrik 3bln,Cash,OUT,340281.0,Operating_Expense
+iuran sampah pasar,Bank_Mutation,IN,1580243.0,Operating_Expense
+pembayaran kewajiban usaha bulanan,Invoice,OUT,4573592.0,Operating_Expense
+nota bengkel service ac,Invoice,OUT,706755.0,Operating_Expense
+langganan wifi,Bank_Mutation,OUT,3737599.0,Operating_Expense
+beli token,Invoice,IN,2003009.0,Operating_Expense
+upah tukang angkut,Transfer,IN,700275.0,Operating_Expense
+pembayaran bunga bank,Invoice,OUT,245111.0,Operating_Expense
+sewa ruko tahunan,QRIS,OUT,808310.0,Operating_Expense
+pembelian sabun lantai,Invoice,OUT,1929989.0,Operating_Expense
+gaji karyawan mingguan,Bank_Mutation,IN,2650281.0,Operating_Expense
+bayar denda retribusi,Bank_Mutation,IN,67290.0,Operating_Expense
+beli sapu dan pel,QRIS,OUT,2689482.0,Operating_Expense
+konsumsi lembur anak-anak,Cash,OUT,1707476.0,Operating_Expense
+cetak spanduk depan,Cash,OUT,2274081.0,Operating_Expense
+parkir bulanan,Cash,IN,3812191.0,Operating_Expense
+service motor kurir,Bank_Mutation,IN,4353888.0,Operating_Expense
+penerimaan,Cash,OUT,2543238.0,Revenue
+uang masuk,Transfer,IN,3814929.0,Revenue
+transfer dari pelanggan,Bank_Mutation,OUT,4612946.0,Revenue
+pembayaran pesanan,QRIS,IN,2448142.0,Revenue
+nota kasir 112,QRIS,OUT,4394822.0,Revenue
+lunas,Cash,IN,1211949.0,Revenue
+dr bu ani,Bank_Mutation,OUT,437411.0,Revenue
+dp catering bpk budi,Invoice,OUT,4890143.0,Revenue
+pelunasan po 12,Bank_Mutation,IN,650673.0,Revenue
+trx qris 091,Invoice,OUT,833984.0,Revenue
+masuk dr gofood,Bank_Mutation,OUT,2121458.0,Revenue
+hasil harian,Transfer,OUT,3778773.0,Revenue
+setoran shift pagi,Transfer,IN,2000972.0,Revenue
+invoice 001 dibayar,Cash,IN,2592703.0,Revenue
+penjualan,QRIS,IN,329489.0,Revenue
+trx shopeepay,QRIS,IN,1158273.0,Revenue
+trf 89112,Transfer,IN,3542126.0,Revenue
+bayar makan meja 4,QRIS,IN,4528046.0,Revenue
+titipan bayar barang,Cash,IN,1197643.0,Revenue
+terima uang muka,Invoice,IN,670236.0,Revenue
+pencairan pinjaman,Transfer,OUT,4039410.0,Financing
+angsuran pokok,Transfer,OUT,3298324.0,Financing
+kredit investasi,Cash,OUT,2340453.0,Financing
+cair kur bri,QRIS,OUT,4920984.0,Financing
+bayar cicilan modal,QRIS,OUT,3643786.0,Financing
+tarikan dana pinjol,QRIS,OUT,959142.0,Financing
+pelunasan hutang,Invoice,OUT,925605.0,Financing
+dana kur masuk,Invoice,OUT,4617095.0,Financing
+bayar pinjaman,Invoice,IN,4281275.0,Financing
+terima kta,QRIS,OUT,4996420.0,Financing
+angsuran bulanan bri,QRIS,IN,4632571.0,Financing
+pembayaran utang ke pt abc,Transfer,OUT,2433349.0,Financing
+cair pnjm julo,Transfer,IN,4513190.0,Financing
+angsuran modal kerja,Transfer,OUT,4926691.0,Financing
+masuk pinjaman rekan,Cash,IN,3927795.0,Financing
+pengembalian dana investor,Cash,OUT,4787015.0,Financing
+pencairan bpkb,Bank_Mutation,OUT,2438490.0,Financing
+potongan angsuran,Transfer,OUT,4843860.0,Financing
+kredit rekening koran,Bank_Mutation,OUT,314178.0,Financing
+setor cicilan,Cash,OUT,2925046.0,Financing
+pemindahan dana antar rekening sendiri,QRIS,OUT,409756.0,Transfer_Internal
+setor tunai kas harian,Transfer,IN,349125.0,Transfer_Internal
+tarik tunai atm,Transfer,IN,4708565.0,Transfer_Internal
+pindah saldo ke bca,Bank_Mutation,IN,2976651.0,Transfer_Internal
+trf ke rek istri,Bank_Mutation,IN,3290292.0,Transfer_Internal
+isi saldo gopay usaha,Bank_Mutation,IN,4674184.0,Transfer_Internal
+wd dari mesin edc,Transfer,IN,1577777.0,Transfer_Internal
+kas ke bank,Cash,IN,3361734.0,Transfer_Internal
+trf rek cadangan,Cash,IN,4645801.0,Transfer_Internal
+ambil cash,QRIS,IN,3109585.0,Transfer_Internal
+setoran ke bank mandiri,Bank_Mutation,OUT,375571.0,Transfer_Internal
+pindah buku ke rek op,Transfer,IN,670958.0,Transfer_Internal
+top up ovo,Cash,OUT,4397559.0,Transfer_Internal
+pindahan dr bca,Cash,IN,2196541.0,Transfer_Internal
+tarik saldo shopee,Bank_Mutation,IN,3062272.0,Transfer_Internal
+simpan tunai,Bank_Mutation,IN,4087350.0,Transfer_Internal
+ambil dr kasir,Cash,OUT,526897.0,Transfer_Internal
+mutasi internal,Transfer,IN,4449666.0,Transfer_Internal
+pindah dana operasional,Bank_Mutation,IN,1415964.0,Transfer_Internal
+sweep in,Transfer,IN,1025951.0,Transfer_Internal
+refund sisa kembalian,Bank_Mutation,OUT,4527629.0,Other
+salah transfer kembalikan,QRIS,OUT,2123643.0,Other
+bonus saldo bca,Cash,OUT,1674447.0,Other
+reversal trx,Transfer,OUT,1317157.0,Other
+cashback bulanan,Invoice,OUT,2144158.0,Other
+koreksi db,QRIS,OUT,4725804.0,Other
+biaya admin bulanan,Transfer,OUT,4174629.0,Other
+pajak bunga,Bank_Mutation,OUT,2154636.0,Other
+uang nyasar,QRIS,OUT,4495918.0,Other
+titipan arisan,QRIS,IN,1058282.0,Other
+potongan admin,Transfer,OUT,1774856.0,Other
+pengembalian kelebihan,Bank_Mutation,IN,2037823.0,Other
+sisa saldo,Bank_Mutation,OUT,4629561.0,Other
+penerimaan hadiah,Transfer,IN,4881268.0,Other
+koreksi cr,Transfer,IN,133684.0,Other
+saldo mengendap,Cash,OUT,2064449.0,Other
+pengembalian dana batal,Transfer,OUT,3938999.0,Other
+biaya layanan aplikasi,QRIS,OUT,203236.0,Other
+promo reward,Invoice,OUT,4084767.0,Other
+saldo tdk terpakai,Invoice,OUT,4104477.0,Other
