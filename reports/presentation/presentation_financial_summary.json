@@ -1,0 +1,15 @@
+{
+    "revenue": 17250000.0,
+    "cogs": 27050000.0,
+    "operating_expense": 11700000.0,
+    "financing_inflow": 25000000.0,
+    "financing_outflow": 6000000.0,
+    "gross_profit": -9800000.0,
+    "gross_margin": -56.811594202898554,
+    "operating_result": -21500000.0,
+    "net_cash_movement": 20600000.0,
+    "included_transaction_count": 97,
+    "pending_review_count": 29,
+    "duplicate_excluded_count": 3,
+    "reconciled_transaction_count": 1
+}

@@ -1,0 +1,2 @@
+period_start,period_end,revenue_stability_status,revenue_cv,cash_flow_consistency_status,cash_flow_positive_months_ratio,payment_behaviour_status,information_completeness_status,information_completeness_rate
+2026-01,2026-06,MODERATE_VARIABILITY,0.4048851035416632,MODERATELY_POSITIVE,0.6666666666666666,OBSERVED_PAYMENTS,HIGHLY_COMPLETE,100.0

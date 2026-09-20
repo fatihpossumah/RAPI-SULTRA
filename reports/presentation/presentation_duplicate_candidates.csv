@@ -1,0 +1,7 @@
+raw_transaction_id,duplicate_status,duplicate_reason,duplicate_group_id,date,channel,amount,description
+86095bd0-73ba-44b5-a19e-b8c6b0e6064a,EXACT_DUPLICATE,exact_same_record,b4372658-6385-4fbe-ab96-909e7fea1522,2026-02-10,Invoice,2000000,Beli stok agen
+489c01fb-fd42-4c00-9bd4-49f047a740f9,EXACT_DUPLICATE,exact_same_record,b4372658-6385-4fbe-ab96-909e7fea1522,2026-02-10,Invoice,2000000,Beli stok agen
+dd0137bd-9e8c-4ff3-b2b6-f32bf5f3296c,POSSIBLE_DUPLICATE,same_reference_same_amount,4a355a16-4801-4967-8e12-0cba63c41460,2026-06-05,QRIS,350000,Pembayaran Toko
+1f34d996-2f41-4aeb-b60f-71248becd526,POSSIBLE_DUPLICATE,same_reference_same_amount,4a355a16-4801-4967-8e12-0cba63c41460,2026-06-06,Bank_Mutation,350000,Settlement QRIS
+ed1b9807-09e4-4f89-ae9d-f7c44f3b9d4f,POSSIBLE_DUPLICATE,similar_transaction_same_amount,2e9990b6-5fcf-4cb9-931f-0179937b9586,2026-06-26,QRIS,150000,Trf pembelian
+4868945e-1806-4eeb-ac65-9782d83b44b1,POSSIBLE_DUPLICATE,similar_transaction_same_amount,2e9990b6-5fcf-4cb9-931f-0179937b9586,2026-06-27,QRIS,150000,Trf pembelian

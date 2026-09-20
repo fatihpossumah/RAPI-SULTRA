@@ -1,0 +1,61 @@
+description,channel,direction,amount,label
+isi saldo gopay usaha,Bank_Mutation,IN,4674184.0,Transfer_Internal
+nota kasir 112,QRIS,OUT,4394822.0,Revenue
+tarik tunai atm,Transfer,IN,4708565.0,Transfer_Internal
+ambil cash,QRIS,IN,3109585.0,Transfer_Internal
+dana kur masuk,Invoice,OUT,4617095.0,Financing
+bayar denda retribusi,Bank_Mutation,IN,67290.0,Operating_Expense
+pembelian benang & kain,Invoice,OUT,1830513.0,COGS
+trf ke rek istri,Bank_Mutation,IN,3290292.0,Transfer_Internal
+pembayaran suplier pt makmur,Bank_Mutation,OUT,2251553.0,COGS
+pengembalian kelebihan,Bank_Mutation,IN,2037823.0,Other
+pelunasan hutang,Invoice,OUT,925605.0,Financing
+masuk dr gofood,Bank_Mutation,OUT,2121458.0,Revenue
+cair pnjm julo,Transfer,IN,4513190.0,Financing
+setor cicilan,Cash,OUT,2925046.0,Financing
+pembayaran kewajiban usaha bulanan,Invoice,OUT,4573592.0,Operating_Expense
+promo reward,Invoice,OUT,4084767.0,Other
+pembayaran bunga bank,Invoice,OUT,245111.0,Operating_Expense
+setor tunai kas harian,Transfer,IN,349125.0,Transfer_Internal
+beli stok krupuk,Transfer,OUT,521451.0,COGS
+masuk pinjaman rekan,Cash,IN,3927795.0,Financing
+iuran sampah pasar,Bank_Mutation,IN,1580243.0,Operating_Expense
+cair kur bri,QRIS,OUT,4920984.0,Financing
+pengembalian dana investor,Cash,OUT,4787015.0,Financing
+bahan pokok,Transfer,IN,1906830.0,COGS
+pindah saldo ke bca,Bank_Mutation,IN,2976651.0,Transfer_Internal
+bayar cicilan modal,QRIS,OUT,3643786.0,Financing
+simpan tunai,Bank_Mutation,IN,4087350.0,Transfer_Internal
+transfer dari pelanggan,Bank_Mutation,OUT,4612946.0,Revenue
+ambil dr kasir,Cash,OUT,526897.0,Transfer_Internal
+titipan arisan,QRIS,IN,1058282.0,Other
+refund sisa kembalian,Bank_Mutation,OUT,4527629.0,Other
+uang masuk,Transfer,IN,3814929.0,Revenue
+parkir bulanan,Cash,IN,3812191.0,Operating_Expense
+bahan adonan,Transfer,OUT,3819836.0,COGS
+penerimaan,Cash,OUT,2543238.0,Revenue
+bayar faktur supplier beras,Transfer,OUT,4926255.0,COGS
+tarikan dana pinjol,QRIS,OUT,959142.0,Financing
+trx qris 091,Invoice,OUT,833984.0,Revenue
+pindahan dr bca,Cash,IN,2196541.0,Transfer_Internal
+pembelian bahan baku utama,QRIS,OUT,1382396.0,COGS
+setoran shift pagi,Transfer,IN,2000972.0,Revenue
+konsumsi lembur anak-anak,Cash,OUT,1707476.0,Operating_Expense
+langganan wifi,Bank_Mutation,OUT,3737599.0,Operating_Expense
+potongan admin,Transfer,OUT,1774856.0,Other
+terima uang muka,Invoice,IN,670236.0,Revenue
+biaya layanan aplikasi,QRIS,OUT,203236.0,Other
+cashback bulanan,Invoice,OUT,2144158.0,Other
+cicilan kendaraan operasional,QRIS,OUT,170180.0,Operating_Expense
+pembelian ATK,Transfer,OUT,1903483.0,Operating_Expense
+trf 89112,Transfer,IN,3542126.0,Revenue
+biaya admin bulanan,Transfer,OUT,4174629.0,Other
+uang nyasar,QRIS,OUT,4495918.0,Other
+pencairan bpkb,Bank_Mutation,OUT,2438490.0,Financing
+tebus sembako dr agen,QRIS,OUT,1170978.0,COGS
+restock gudang,Cash,OUT,3354174.0,COGS
+beli ayam 10kg,Invoice,OUT,4865848.0,COGS
+pembelian sabun lantai,Invoice,OUT,1929989.0,Operating_Expense
+lunas,Cash,IN,1211949.0,Revenue
+setoran ke bank mandiri,Bank_Mutation,OUT,375571.0,Transfer_Internal
+sisa saldo,Bank_Mutation,OUT,4629561.0,Other

@@ -1,0 +1,61 @@
+{
+    "profile_metadata": {
+        "source": "RAPI-SULTRA PoC",
+        "period_start": "2026-01",
+        "period_end": "2026-06",
+        "profile_type": "Profil Kesiapan Pembiayaan"
+    },
+    "revenue_stability": {
+        "status": "MODERATE_VARIABILITY",
+        "evidence": {
+            "active_months": 6,
+            "average_monthly_revenue": 2875000.0,
+            "minimum_monthly_revenue": 1850000.0,
+            "maximum_monthly_revenue": 4350000.0,
+            "coefficient_of_variation": 0.4048851035416632
+        },
+        "interpretation": "Pendapatan teramati selama 6 bulan aktif dengan status MODERATE_VARIABILITY. Ini adalah proksi deskriptif dan tidak menjamin stabilitas pendapatan di masa depan.",
+        "data_sufficiency": "SUFFICIENT"
+    },
+    "cash_flow_consistency": {
+        "status": "MODERATELY_POSITIVE",
+        "evidence": {
+            "observed_months": 6,
+            "positive_months": 4,
+            "negative_months": 2,
+            "average_monthly_net_cash_movement": 3433333.333333333
+        },
+        "interpretation": "Pergerakan kas bersih bernilai positif pada 4 dari total 6 bulan yang teramati.",
+        "data_sufficiency": "SUFFICIENT"
+    },
+    "payment_behaviour": {
+        "status": "OBSERVED_PAYMENT_ACTIVITY",
+        "evidence": {
+            "months_with_payment": 5,
+            "total_financing_outflow_observed": 6000000.0
+        },
+        "interpretation": "Terdapat pengeluaran pembiayaan yang teramati selama 5 bulan.",
+        "data_sufficiency": "LIMITED",
+        "limitation": "Pengeluaran pembiayaan yang teramati tidak membuktikan kualitas pembayaran, ketepatan waktu, atau kelayakan kredit karena tidak adanya tanggal jatuh tempo atau jadwal yang tervalidasi."
+    },
+    "information_completeness": {
+        "status": "HIGHLY_COMPLETE",
+        "evidence": {
+            "overall_completeness_rate": 100.0,
+            "transaction_count": 97,
+            "complete_transaction_count": 97,
+            "review_required_count": 29,
+            "reconciled_count": 1,
+            "duplicate_candidate_count": 3
+        },
+        "interpretation": "Dataset memiliki tingkat kelengkapan atribut keseluruhan sebesar 100.0%. Ini hanya mengukur keberadaan data, bukan kualitas kredit.",
+        "data_sufficiency": "SUFFICIENT"
+    },
+    "profile_summary": {
+        "observed_period_months": 6,
+        "dimensions_available": 3,
+        "dimensions_with_limited_data": 1,
+        "summary": "Profil ini memuat bukti observasi mengenai stabilitas pendapatan, konsistensi arus kas, aktivitas pembayaran, dan kelengkapan informasi transaksi."
+    },
+    "disclaimer": "Profil ini murni merupakan lapisan bukti deskriptif Proof-of-Concept dan bukan merupakan skor kredit atau keputusan pembiayaan yang tervalidasi."
+}

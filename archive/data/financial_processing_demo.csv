@@ -1,0 +1,21 @@
+date,channel,direction,description,amount,reference_id,predicted_label,confidence,review_status
+2026-10-01,QRIS,IN,Pembayaran Pelanggan,150000.0,QR-001,Revenue,0.95,AUTO_CLASSIFIED
+2026-10-01,Cash,IN,Uang masuk gak jelas,25000.0,CSH-001,Revenue,0.65,REVIEW_REQUIRED
+2026-10-02,Transfer,OUT,Beli Bahan Baku Tepung,500000.0,TRF-001,COGS,0.88,AUTO_CLASSIFIED
+2026-10-03,Bank_Mutation,OUT,Bayar Listrik PLN,350000.0,BM-001,Operating_Expense,0.92,AUTO_CLASSIFIED
+2026-10-04,Transfer,IN,Pencairan Pinjaman KUR,10000000.0,LN-001,Financing,0.9,AUTO_CLASSIFIED
+2026-10-05,Transfer,OUT,Bayar Cicilan KUR,1000000.0,LN-002,Financing,0.93,AUTO_CLASSIFIED
+2026-10-06,Transfer,IN,Pindah dana dari BCA ke Mandiri,5000000.0,INT-001,Transfer_Internal,0.85,AUTO_CLASSIFIED
+2026-10-07,Bank_Mutation,OUT,Biaya admin tidak dikenal,6500.0,BM-002,Other,0.5,REVIEW_REQUIRED
+2026-10-08,Invoice,IN,Invoice Penjualan,75000.0,INV-001,Revenue,0.82,AUTO_CLASSIFIED
+2026-10-08,Invoice,IN,Invoice Penjualan,75000.0,INV-001,Revenue,0.82,AUTO_CLASSIFIED
+2026-10-08,Invoice,IN,Tagihan Budi,100000.0,INV-002,Revenue,0.8,AUTO_CLASSIFIED
+2026-10-09,QRIS,IN,Pembayaran Budi via QRIS,100000.0,INV-002,Revenue,0.8,AUTO_CLASSIFIED
+2026-10-10,QRIS,IN,Customer A,250000.0,QR-002,Revenue,0.9,AUTO_CLASSIFIED
+2026-10-10,Bank_Mutation,IN,Settlement QRIS A,250000.0,QR-002,Revenue,0.9,AUTO_CLASSIFIED
+2026-10-11,Transfer,IN,Transfer dari Budi,300000.0,TRF-003,Revenue,0.88,AUTO_CLASSIFIED
+2026-10-11,Bank_Mutation,IN,TRF IN BUDI,300000.0,,Revenue,0.75,AUTO_CLASSIFIED
+2026-10-12,Cash,IN,Penjualan Tunai,50000.0,CSH-002,Revenue,0.85,AUTO_CLASSIFIED
+2026-10-12,Bank_Mutation,IN,Setoran Tunai,50000.0,BM-003,Transfer_Internal,0.7,AUTO_CLASSIFIED
+2026-10-13,Transfer,IN,DP Masuk,1000000.0,TRF-004,Revenue,0.9,AUTO_CLASSIFIED
+2026-10-13,Transfer,OUT,Bayar Supplier,1000000.0,TRF-005,COGS,0.92,AUTO_CLASSIFIED
