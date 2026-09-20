@@ -3,12 +3,21 @@
  * Automated Financial Record, Income Statement & Cash Flow (Bahasa Indonesia)
  */
 
-import { state, formatCurrency, getValidTransactions } from '../state.js';
-import { calculateFinancials, getRevenueTrend, getCashFlowTrend, getInformationCompleteness } from '../mock-engine.js';
-import { createRevenueTrendChart, createCashFlowChart, createExpenseBreakdownChart } from '../charts.js';
+import { state, formatCurrency } from '../state.js';
+import { createRevenueTrendChart, createExpenseBreakdownChart } from '../charts.js';
+
+const INDO_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+function formatMonthLabel(monthStr) {
+  if (!monthStr) return 'Unknown';
+  const parts = monthStr.split('-');
+  if (parts.length < 2) return monthStr;
+  const [y, m] = parts;
+  return `${INDO_MONTHS[parseInt(m) - 1]} ${y}`;
+}
 
 export function renderFinancial() {
-  if (!state.demoLoaded || state.transactions.length === 0) {
+  if (!state.demoLoaded || !state.financialSummary) {
     return `
       <div class="page">
         <div class="page-header">
@@ -21,18 +30,17 @@ export function renderFinancial() {
           <div class="empty-icon">
             <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><path d="M4 28V14l6-4 6 4 6-6 6 6 6-4v18H4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
           </div>
-          <div class="empty-title">Belum ada data transaksi yang dimuat.</div>
-          <div class="empty-subtitle">Buka halaman Ikhtisar lalu klik "Muat Data Simulasi" untuk menyusun profil keuangan otomatis.</div>
+          <div class="empty-title">Belum ada data dari backend RAPI-SULTRA.</div>
+          <div class="empty-subtitle">Klik "Muat Data Simulasi" untuk mengambil data presentasi dari backend.</div>
         </div>
       </div>
     `;
   }
 
-  const txns = state.transactions;
-  const validTxns = getValidTransactions();
-  const fin = calculateFinancials(txns);
-  const comp = getInformationCompleteness(txns);
-  const pendingReviewCount = txns.length - validTxns.length;
+  const fin = state.financialSummary;
+  const val = state.validation || {};
+  const pendingReviewCount = fin.pending_review_count || 0;
+  const validTxnsCount = fin.included_transaction_count || 0;
 
   return `
     <div class="page">
@@ -51,7 +59,7 @@ export function renderFinancial() {
 
       <!-- Scope / Quality Banner -->
       <div class="evidence-disclaimer" style="margin-bottom: 24px;">
-        <strong>Basis Perhitungan:</strong> Profil keuangan dihitung dari <strong>${validTxns.length} transaksi terverifikasi</strong> (Auto-classified & Validated). 
+        <strong>Basis Perhitungan:</strong> Profil keuangan dihitung dari <strong>${validTxnsCount} transaksi terverifikasi</strong> (Auto-classified & Validated). 
         ${pendingReviewCount > 0 ? `<span style="color:var(--warning);font-weight:600">⚠ ${pendingReviewCount} transaksi dalam Pusat Review dikecualikan</span> untuk menjaga kemurnian pembukuan.` : 'Semua transaksi telah tervalidasi 100%.'}
       </div>
 
@@ -62,7 +70,7 @@ export function renderFinancial() {
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2v16M14 6H8.5a3.5 3.5 0 000 7h3a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           </div>
           <div class="kpi-label">Pendapatan Usaha Bruto</div>
-          <div class="kpi-value" style="color:var(--success)">${formatCurrency(fin.revenue)}</div>
+          <div class="kpi-value" style="color:var(--success)">${formatCurrency(fin.revenue || 0)}</div>
           <div class="kpi-sub">Arus masuk penjualan multi-kanal</div>
         </div>
 
@@ -71,7 +79,7 @@ export function renderFinancial() {
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 6h14M3 10h14M3 14h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           </div>
           <div class="kpi-label">HPP (Bahan Baku / COGS)</div>
-          <div class="kpi-value" style="color:var(--danger)">${formatCurrency(fin.cogs)}</div>
+          <div class="kpi-value" style="color:var(--danger)">${formatCurrency(fin.cogs || 0)}</div>
           <div class="kpi-sub">Biaya persediaan & bahan baku langsung</div>
         </div>
 
@@ -80,8 +88,8 @@ export function renderFinancial() {
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M10 5v5l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           </div>
           <div class="kpi-label">Laba Kotor (Gross Profit)</div>
-          <div class="kpi-value">${formatCurrency(fin.grossProfit)}</div>
-          <div class="kpi-sub">Margin Laba Kotor: <strong>${fin.grossMargin}%</strong></div>
+          <div class="kpi-value">${formatCurrency(fin.gross_profit || 0)}</div>
+          <div class="kpi-sub">Margin Laba Kotor: <strong>${(fin.gross_margin || 0).toFixed(1)}%</strong></div>
         </div>
 
         <div class="kpi-card">
@@ -89,150 +97,101 @@ export function renderFinancial() {
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 14l4-4 3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 8V4h-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           </div>
           <div class="kpi-label">Hasil Operasi Bersih (EBIT)</div>
-          <div class="kpi-value" style="color:${fin.operatingResult >= 0 ? 'var(--success)' : 'var(--danger)'}">
-            ${formatCurrency(fin.operatingResult)}
+          <div class="kpi-value" style="color:${(fin.operating_result || 0) >= 0 ? 'var(--success)' : 'var(--danger)'}">
+            ${formatCurrency(fin.operating_result || 0)}
           </div>
-          <div class="kpi-sub">Setelah Beban Operasional: ${formatCurrency(fin.opex)}</div>
+          <div class="kpi-sub">Setelah Beban Operasional: ${formatCurrency(fin.operating_expense || 0)}</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon" style="background:rgba(22, 163, 74, 0.1);color:var(--success)">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 10l5 5 5-5M10 3v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="kpi-label">Pembiayaan Masuk</div>
+          <div class="kpi-value" style="color:var(--success)">${formatCurrency(fin.financing_inflow || 0)}</div>
+          <div class="kpi-sub">Inflow pendanaan operasional</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon" style="background:rgba(220, 38, 38, 0.1);color:var(--danger)">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 10l5-5 5 5M10 17V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="kpi-label">Pembiayaan Keluar</div>
+          <div class="kpi-value" style="color:var(--danger)">${formatCurrency(fin.financing_outflow || 0)}</div>
+          <div class="kpi-sub">Pelunasan atau outflow pembiayaan</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon" style="background:rgba(99, 102, 241, 0.1);color:var(--primary)">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12 8c-1-1-3-1-4-1s-3 1-3 3 1 3 4 3 3 1 3 3-1 3-3 3-4-1-5-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 3v14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="kpi-label">Pergerakan Kas Bersih</div>
+          <div class="kpi-value" style="color:${(fin.net_cash_movement || 0) >= 0 ? 'var(--success)' : 'var(--danger)'}">
+            ${(fin.net_cash_movement || 0) < 0 ? '-' : ''}${formatCurrency(fin.net_cash_movement || 0)}
+          </div>
+          <div class="kpi-sub">Hasil akhir ketersediaan dana</div>
         </div>
       </div>
 
       <!-- Charts Section -->
-      <div class="grid-2" style="margin-bottom: 24px;">
+      <div style="margin-bottom: 24px;">
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Tren Pendapatan Bulanan</div>
-            <span style="font-size:12px;color:var(--text-secondary)">Fluktuasi omzet per bulan</span>
+            <h3>Tren Pendapatan</h3>
           </div>
-          <div class="card-body">
-            <div class="chart-container" style="height: 260px;">
-              <canvas id="chart-fin-revenue"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Arus Kas Masuk vs Keluar</div>
-            <span style="font-size:12px;color:var(--text-secondary)">Perbandingan Inflow vs Outflow</span>
-          </div>
-          <div class="card-body">
-            <div class="chart-container" style="height: 260px;">
-              <canvas id="chart-fin-cashflow"></canvas>
-            </div>
+          <div class="chart-container">
+            <canvas id="chart-revenue"></canvas>
           </div>
         </div>
       </div>
 
-      <!-- Income Statement & Expenses Breakdown -->
-      <div class="grid-2" style="margin-bottom: 24px;">
-        <!-- Standard Income Statement -->
+      <div class="grid-2">
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Catatan Keuangan Otomatis (Laba Rugi)</div>
-            <span class="badge badge-auto">Standar SAK EMKM</span>
+            <h3>Struktur Biaya Usaha</h3>
           </div>
-          <div class="card-body">
-            <div class="metric-row">
-              <span class="metric-label" style="font-weight:600;color:var(--text-primary)">1. Pendapatan Usaha (Revenue)</span>
-              <span class="metric-value positive">${formatCurrency(fin.revenue)}</span>
-            </div>
-            <div class="metric-row" style="padding-left:14px;">
-              <span class="metric-label">2. Beban Pokok Penjualan (HPP / COGS)</span>
-              <span class="metric-value negative">(${formatCurrency(fin.cogs)})</span>
-            </div>
-            
-            <div class="metric-divider"></div>
-            
-            <div class="metric-row" style="background:var(--bg);padding:10px 12px;border-radius:var(--radius);">
-              <span class="metric-label" style="font-weight:700;color:var(--text-primary)">Laba Kotor (Gross Profit)</span>
-              <span class="metric-value" style="color:var(--primary)">${formatCurrency(fin.grossProfit)}</span>
-            </div>
-
-            <div class="metric-row" style="padding-left:14px;margin-top:6px;">
-              <span class="metric-label">3. Beban Operasional (OPEX - Sewa, Gaji, Listrik, Operasional)</span>
-              <span class="metric-value negative">(${formatCurrency(fin.opex)})</span>
-            </div>
-
-            <div class="metric-divider"></div>
-
-            <div class="metric-row" style="background:rgba(22,163,74,0.08);padding:10px 12px;border-radius:var(--radius);">
-              <span class="metric-label" style="font-weight:700;color:var(--success)">Hasil Usaha Operasional Bersih (Operating Result)</span>
-              <span class="metric-value" style="color:var(--success);font-size:16px;">${formatCurrency(fin.operatingResult)}</span>
-            </div>
-
-            <div style="margin-top:20px;padding-top:14px;border-top:1px dashed var(--border);">
-              <div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">
-                Pemisahan Aktivitas Pembiayaan (Non-Operasional)
-              </div>
-              <div class="metric-row" style="padding:6px 0;">
-                <span class="metric-label">Pencairan Pembiayaan / Modal Masuk (Financing In)</span>
-                <span class="metric-value positive">+${formatCurrency(fin.financingIn)}</span>
-              </div>
-              <div class="metric-row" style="padding:6px 0;">
-                <span class="metric-label">Angsuran Pokok / Cicilan Pinjaman (Financing Out)</span>
-                <span class="metric-value negative">-${formatCurrency(fin.financingOut)}</span>
-              </div>
-              <div class="metric-row" style="padding:6px 0;">
-                <span class="metric-label">Arus Kas Pembiayaan Bersih (Net Financing)</span>
-                <span class="metric-value" style="color:var(--text-secondary)">${formatCurrency(fin.netFinancing)}</span>
-              </div>
+          <div class="chart-container" style="display:flex; justify-content:center;">
+            <div style="width: 250px; height: 250px;">
+              <canvas id="chart-expense-breakdown"></canvas>
             </div>
           </div>
         </div>
 
-        <!-- Expense Composition & Data Hygiene -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Komposisi Beban & Higienitas Data</div>
-            <span style="font-size:12px;color:var(--text-secondary)">Analisis Beban</span>
+        <!-- Income Statement Summary List -->
+        <div class="card p-0">
+          <div class="card-header" style="padding: 20px;">
+            <h3>Laporan Laba Rugi Singkat</h3>
           </div>
-          <div class="card-body">
-            <div class="chart-container" style="height: 180px; margin-bottom: 20px;">
-              <canvas id="chart-fin-expenses"></canvas>
+          <div class="list-group">
+            <div class="list-item" style="justify-content: space-between; padding: 16px 20px;">
+              <span style="font-weight: 500;">(+) Pendapatan Usaha</span>
+              <span style="color:var(--success);font-weight:600">${formatCurrency(fin.revenue || 0)}</span>
             </div>
-
-            <div style="border-top:1px solid var(--border);padding-top:16px;">
-              <div style="font-size:12px;font-weight:700;margin-bottom:12px;">Kelengkapan Informasi Transaksi (Data Hygiene)</div>
-              
-              <div style="margin-bottom:10px;">
-                <div class="progress-label">
-                  <span>Deskripsi Transaksi Lengkap & Jelas</span>
-                  <span>${comp.description}%</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill fill-primary" style="width:${comp.description}%"></div>
-                </div>
-              </div>
-
-              <div style="margin-bottom:10px;">
-                <div class="progress-label">
-                  <span>Nomor Referensi & Traceability Audit</span>
-                  <span>${comp.reference}%</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill fill-info" style="width:${comp.reference}%"></div>
-                </div>
-              </div>
-
-              <div style="margin-bottom:10px;">
-                <div class="progress-label">
-                  <span>Kanal Pembayaran Terverifikasi</span>
-                  <span>${comp.channel}%</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill fill-success" style="width:${comp.channel}%"></div>
-                </div>
-              </div>
-
-              <div>
-                <div class="progress-label">
-                  <span>Keabsahan Tanggal & Validitas Nilai</span>
-                  <span>${comp.date}%</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill fill-success" style="width:${comp.date}%"></div>
-                </div>
-              </div>
+            <div class="list-item" style="justify-content: space-between; padding: 16px 20px; background:var(--bg-secondary)">
+              <span>(-) HPP / Bahan Baku</span>
+              <span style="color:var(--danger)">${formatCurrency(fin.cogs || 0)}</span>
+            </div>
+            <div class="list-item" style="justify-content: space-between; padding: 16px 20px; border-bottom: 2px solid var(--border-color)">
+              <span style="font-weight: 600;">Laba Kotor</span>
+              <span style="font-weight: 600; color:${(fin.gross_profit || 0) < 0 ? 'var(--danger)' : 'var(--text-primary)'}">
+                ${(fin.gross_profit || 0) < 0 ? '-' : ''}${formatCurrency(fin.gross_profit || 0)}
+              </span>
+            </div>
+            <div class="list-item" style="justify-content: space-between; padding: 16px 20px; background:var(--bg-secondary)">
+              <span>(-) Beban Operasional</span>
+              <span style="color:var(--danger)">${formatCurrency(fin.operating_expense || 0)}</span>
+            </div>
+            <div class="list-item" style="justify-content: space-between; padding: 16px 20px;">
+              <span style="font-weight: 600; font-size: 1.1em;">Hasil Operasi (EBIT)</span>
+              <span style="font-weight: 700; font-size: 1.1em; color:${(fin.operating_result || 0) >= 0 ? 'var(--success)' : 'var(--danger)'}">
+                ${(fin.operating_result || 0) < 0 ? '-' : ''}${formatCurrency(fin.operating_result || 0)}
+              </span>
+            </div>
+            <div class="list-item" style="justify-content: space-between; padding: 16px 20px; background:var(--bg-secondary)">
+              <span>Pergerakan Kas Bersih (Net Cash)</span>
+              <span style="font-weight: 600; color:${(fin.net_cash_movement || 0) >= 0 ? 'var(--success)' : 'var(--danger)'}">
+                ${(fin.net_cash_movement || 0) < 0 ? '-' : ''}${formatCurrency(fin.net_cash_movement || 0)}
+              </span>
             </div>
           </div>
         </div>
@@ -242,21 +201,23 @@ export function renderFinancial() {
 }
 
 export function initFinancial() {
-  if (!state.demoLoaded || state.transactions.length === 0) return;
+  if (!state.demoLoaded || !state.monthlySummary) return;
 
-  const fin = calculateFinancials(state.transactions);
-  const revTrend = getRevenueTrend(state.transactions);
-  const cashTrend = getCashFlowTrend(state.transactions);
+  const monthly = state.monthlySummary;
+  
+  // Filter empty rows
+  const validMonthly = monthly.filter(m => m.month && m.month.trim() !== '');
 
-  if (revTrend.labels.length > 0) {
-    createRevenueTrendChart('chart-fin-revenue', revTrend);
-  }
+  // Format data for Revenue Chart
+  const revenueData = {
+    labels: validMonthly.map(m => formatMonthLabel(m.month)),
+    data: validMonthly.map(m => parseFloat(m.revenue || 0))
+  };
+  createRevenueTrendChart('chart-revenue', revenueData);
 
-  if (cashTrend.labels.length > 0) {
-    createCashFlowChart('chart-fin-cashflow', cashTrend);
-  }
 
-  if (fin.cogs > 0 || fin.opex > 0) {
-    createExpenseBreakdownChart('chart-fin-expenses', fin.cogs, fin.opex);
-  }
+
+  // Expense Breakdown
+  const fin = state.financialSummary;
+  createExpenseBreakdownChart('chart-expense-breakdown', fin.cogs || 0, fin.operating_expense || 0);
 }

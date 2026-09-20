@@ -128,23 +128,38 @@ img { max-width: 100%; }
 .logo-p { color: #34D399; }
 .logo-i { color: #94A3B8; }
 
+.logo-text {
+  min-width: 0; /* Ensures flex item can shrink to wrap text */
+  flex: 1;
+}
+
 .logo-text h1 {
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.5px;
-  white-space: nowrap;
+  white-space: normal; /* Allow title to wrap if needed on very small screens */
+  line-height: 1.2;
 }
 
 .logo-text p {
   font-size: 10px;
   color: rgba(255,255,255,0.5);
-  white-space: nowrap;
-  margin-top: 2px;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
+  max-width: 100%;
+  line-height: 1.35;
+  margin-top: 4px;
 }
 
-.sidebar.collapsed .logo-text {
-  opacity: 0;
-  width: 0;
+.sidebar.collapsed .sidebar-logo {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-header {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .sidebar-toggle {
@@ -272,8 +287,9 @@ img { max-width: 100%; }
 
 /* --- Page --- */
 .page {
-  padding: 28px 32px 48px;
-  max-width: 1400px;
+  padding: 24px 32px 48px;
+  max-width: 1600px;
+  margin: 0 auto;
   animation: fadeIn 0.3s ease;
 }
 
@@ -423,7 +439,7 @@ img { max-width: 100%; }
 /* --- KPI Grid --- */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
@@ -654,6 +670,11 @@ img { max-width: 100%; }
   background: rgba(15,118,110,0.08);
   color: var(--rapi-p);
 }
+
+.badge-success { background: var(--success-bg); color: var(--success); }
+.badge-warning { background: var(--warning-bg); color: #B45309; }
+.badge-info { background: var(--info-bg); color: var(--info); }
+.badge-danger { background: var(--danger-bg); color: var(--danger); }
 
 .badge-channel {
   background: var(--bg);
@@ -1702,6 +1723,10 @@ img { max-width: 100%; }
 .indicator-status.status-neutral { color: var(--text-primary); }
 
 /* --- Responsive --- */
+@media (max-width: 1280px) {
+  /* kpi-grid handled by auto-fit */
+}
+
 @media (max-width: 1200px) {
   .grid-4 { grid-template-columns: 1fr 1fr; }
   .source-grid { grid-template-columns: repeat(3, 1fr); }
@@ -1729,7 +1754,6 @@ img { max-width: 100%; }
 }
 
 @media (max-width: 600px) {
-  .kpi-grid { grid-template-columns: 1fr 1fr; }
   .source-grid { grid-template-columns: repeat(2, 1fr); }
   .page-header { flex-direction: column; }
   .page-actions { width: 100%; }

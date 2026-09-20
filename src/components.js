@@ -167,63 +167,33 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// ==================== ADD TRANSACTION MODAL ====================
+// ==================== UPLOAD CSV MODAL ====================
 
 export function getAddTransactionModalHTML() {
   return `
     <div class="modal-header">
-      <h3 class="modal-title">Tambah Transaksi Baru</h3>
-      <button class="modal-close" onclick="document.getElementById('modal').classList.add('hidden');document.getElementById('modal-overlay').classList.add('hidden')">
+      <h3 class="modal-title">Upload CSV Transaksi</h3>
+      <button class="modal-close" id="btn-close-modal">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </button>
     </div>
     <div class="modal-body">
-      <div id="add-txn-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Tanggal</label>
-            <input type="date" id="txn-date" class="form-input" value="${new Date().toISOString().slice(0, 10)}" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Kanal Pembayaran</label>
-            <select id="txn-channel" class="form-input">
-              <option value="QRIS">QRIS</option>
-              <option value="Transfer">Transfer Bank</option>
-              <option value="Cash">Tunai (Cash)</option>
-              <option value="Invoice">Invoice / Nota</option>
-              <option value="Bank Mutation">Mutasi Bank</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Arah Dana</label>
-            <select id="txn-direction" class="form-input">
-              <option value="IN">IN (Pemasukan / Inflow)</option>
-              <option value="OUT">OUT (Pengeluaran / Outflow)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Nominal (Rp)</label>
-            <input type="number" id="txn-amount" class="form-input" placeholder="0" min="0" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Deskripsi Transaksi</label>
-          <input type="text" id="txn-description" class="form-input" placeholder="contoh: Pembayaran QRIS dari pelanggan katering" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Nomor Referensi (opsional)</label>
-          <input type="text" id="txn-reference" class="form-input" placeholder="contoh: QRIS-2026-0099" />
-        </div>
+      <div id="upload-csv-area" style="border: 2px dashed var(--border); border-radius: var(--radius-lg); padding: 40px; text-align: center; cursor: pointer; transition: var(--transition); background: var(--bg);">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" style="color: var(--primary); margin-bottom: 16px;">
+          <path d="M12 4v12M12 4l-4 4M12 4l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">Pilih atau Tarik File CSV</div>
+        <div style="font-size: 13px; color: var(--text-secondary);">Kolom wajib: date, channel, direction, description, amount, reference_id</div>
       </div>
-      <div id="ai-result-container" class="hidden"></div>
+      <input type="file" id="csv-file-input" accept=".csv" class="hidden" />
+      <div id="upload-status" class="hidden mt-16 text-center"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" id="btn-cancel-txn">Batal</button>
-      <button class="btn btn-primary" id="btn-process-txn">
+      <button class="btn btn-primary" id="btn-process-txn" disabled>
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M8 2v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        Proses Klasifikasi AI
+        Upload & Proses AI
       </button>
     </div>
   `;

@@ -4,11 +4,45 @@
  */
 
 import { state } from '../state.js';
-import { calculateFinancials, getInformationCompleteness, generateRAPIProfile } from '../mock-engine.js';
 import { createRAPIRadarChart } from '../charts.js';
 
+// Mapping kualitatif ke pseudo-nilai murni untuk visualisasi Radar Chart (tidak untuk ditampilkan sebagai skor)
+function getPseudoValue(status) {
+    if (!status) return 0;
+    if (status.includes('HIGHLY_') || status.includes('HIGH_')) return 90;
+    if (status.includes('MODERATE') || status.includes('OBSERVED')) return 65;
+    if (status.includes('LOW') || status.includes('NEGATIVE') || status.includes('VARIABLE')) return 40;
+    return 10;
+}
+
+function getStatusClass(status) {
+    if (!status) return 'limited';
+    if (status.includes('HIGHLY_') || status.includes('HIGH_')) return 'strong';
+    if (status.includes('MODERATE') || status.includes('OBSERVED')) return 'moderate';
+    return 'limited';
+}
+
+function getLabelId(status) {
+    // Map raw status dict
+    const dict = {
+        "HIGHLY_STABLE": "Sangat Stabil",
+        "MODERATE_VARIABILITY": "Variabilitas Sedang",
+        "HIGHLY_VARIABLE": "Sangat Variatif",
+        "HIGHLY_POSITIVE": "Sangat Positif",
+        "MODERATELY_POSITIVE": "Positif Moderat",
+        "NEGATIVE_CASH_FLOW": "Arus Kas Negatif",
+        "HIGH_PAYMENT_ACTIVITY": "Sangat Aktif",
+        "OBSERVED_PAYMENT_ACTIVITY": "Aktivitas Teramati",
+        "LOW_PAYMENT_ACTIVITY": "Kurang Aktif",
+        "HIGHLY_COMPLETE": "Sangat Lengkap",
+        "MODERATELY_COMPLETE": "Cukup Lengkap",
+        "LOW_COMPLETENESS": "Kurang Lengkap"
+    };
+    return dict[status] || status;
+}
+
 export function renderRAPI() {
-  if (!state.demoLoaded || state.transactions.length === 0) {
+  if (!state.demoLoaded || !state.rapiProfile) {
     return `
       <div class="page">
         <div class="page-header">
@@ -22,16 +56,47 @@ export function renderRAPI() {
             <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="14" stroke="currentColor" stroke-width="2"/><path d="M18 10v8l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </div>
           <div class="empty-title">Belum ada data profil yang tersedia.</div>
-          <div class="empty-subtitle">Buka halaman Ikhtisar lalu klik "Muat Data Simulasi" untuk menyusun Profil RAPI.</div>
+          <div class="empty-subtitle">Klik "Muat Data Simulasi" untuk menyusun Profil RAPI dari backend.</div>
         </div>
       </div>
     `;
   }
 
-  const txns = state.transactions;
-  const fin = calculateFinancials(txns);
-  const comp = getInformationCompleteness(txns);
-  const rapi = generateRAPIProfile(txns, fin, comp);
+  const p = state.rapiProfile;
+  const mappedRapi = {
+      R: {
+          name: 'Revenue Stability',
+          statusRaw: p.revenue_stability.status,
+          status: getLabelId(p.revenue_stability.status),
+          description: p.revenue_stability.interpretation,
+          statusClass: getStatusClass(p.revenue_stability.status),
+          value: getPseudoValue(p.revenue_stability.status)
+      },
+      A: {
+          name: 'Account / Cash-flow Consistency',
+          statusRaw: p.cash_flow_consistency.status,
+          status: getLabelId(p.cash_flow_consistency.status),
+          description: p.cash_flow_consistency.interpretation,
+          statusClass: getStatusClass(p.cash_flow_consistency.status),
+          value: getPseudoValue(p.cash_flow_consistency.status)
+      },
+      P: {
+          name: 'Payment Behaviour',
+          statusRaw: p.payment_behaviour.status,
+          status: getLabelId(p.payment_behaviour.status),
+          description: p.payment_behaviour.interpretation,
+          statusClass: getStatusClass(p.payment_behaviour.status),
+          value: getPseudoValue(p.payment_behaviour.status)
+      },
+      I: {
+          name: 'Information Completeness',
+          statusRaw: p.information_completeness.status,
+          status: getLabelId(p.information_completeness.status),
+          description: p.information_completeness.interpretation,
+          statusClass: getStatusClass(p.information_completeness.status),
+          value: getPseudoValue(p.information_completeness.status)
+      }
+  };
 
   return `
     <div class="page">
@@ -83,163 +148,63 @@ export function renderRAPI() {
             <!-- Dim R -->
             <div style="padding: 12px; border-radius: var(--radius); background: rgba(29,78,216,0.04); border: 1px solid rgba(29,78,216,0.15);">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                <span style="font-weight:700; color:var(--rapi-r)">R — ${rapi.R.name}</span>
-                <span class="rapi-dim-status ${rapi.R.statusClass === 'strong' ? 'rapi-status-strong' : rapi.R.statusClass === 'moderate' ? 'rapi-status-moderate' : 'rapi-status-limited'}">
-                  ${rapi.R.status}
+                <span style="font-weight:700; color:var(--rapi-r)">R — ${mappedRapi.R.name}</span>
+                <span class="rapi-dim-status ${mappedRapi.R.statusClass === 'strong' ? 'rapi-status-strong' : mappedRapi.R.statusClass === 'moderate' ? 'rapi-status-moderate' : 'rapi-status-limited'}">
+                  ${mappedRapi.R.status}
                 </span>
               </div>
-              <div style="font-size:12px; color:var(--text-secondary);">${rapi.R.description}</div>
+              <div style="font-size:12px; color:var(--text-secondary);">${mappedRapi.R.description}</div>
             </div>
 
             <!-- Dim A -->
             <div style="padding: 12px; border-radius: var(--radius); background: rgba(37,99,235,0.04); border: 1px solid rgba(37,99,235,0.15);">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                <span style="font-weight:700; color:var(--rapi-a)">A — ${rapi.A.name}</span>
-                <span class="rapi-dim-status ${rapi.A.statusClass === 'strong' ? 'rapi-status-strong' : rapi.A.statusClass === 'moderate' ? 'rapi-status-moderate' : 'rapi-status-limited'}">
-                  ${rapi.A.status}
+                <span style="font-weight:700; color:var(--rapi-a)">A — ${mappedRapi.A.name}</span>
+                <span class="rapi-dim-status ${mappedRapi.A.statusClass === 'strong' ? 'rapi-status-strong' : mappedRapi.A.statusClass === 'moderate' ? 'rapi-status-moderate' : 'rapi-status-limited'}">
+                  ${mappedRapi.A.status}
                 </span>
               </div>
-              <div style="font-size:12px; color:var(--text-secondary);">${rapi.A.description}</div>
+              <div style="font-size:12px; color:var(--text-secondary);">${mappedRapi.A.description}</div>
             </div>
 
             <!-- Dim P -->
             <div style="padding: 12px; border-radius: var(--radius); background: rgba(15,118,110,0.04); border: 1px solid rgba(15,118,110,0.15);">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                <span style="font-weight:700; color:var(--rapi-p)">P — ${rapi.P.name}</span>
-                <span class="rapi-dim-status ${rapi.P.statusClass === 'strong' ? 'rapi-status-strong' : rapi.P.statusClass === 'moderate' ? 'rapi-status-moderate' : 'rapi-status-limited'}">
-                  ${rapi.P.status}
+                <span style="font-weight:700; color:var(--rapi-p)">P — ${mappedRapi.P.name}</span>
+                <span class="rapi-dim-status ${mappedRapi.P.statusClass === 'strong' ? 'rapi-status-strong' : mappedRapi.P.statusClass === 'moderate' ? 'rapi-status-moderate' : 'rapi-status-limited'}">
+                  ${mappedRapi.P.status}
                 </span>
               </div>
-              <div style="font-size:12px; color:var(--text-secondary);">${rapi.P.description}</div>
+              <div style="font-size:12px; color:var(--text-secondary);">${mappedRapi.P.description}</div>
             </div>
 
             <!-- Dim I -->
-            <div style="padding: 12px; border-radius: var(--radius); background: rgba(71,85,105,0.04); border: 1px solid rgba(71,85,105,0.15);">
+            <div style="padding: 12px; border-radius: var(--radius); background: rgba(100,116,139,0.04); border: 1px solid rgba(100,116,139,0.15);">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                <span style="font-weight:700; color:var(--rapi-i)">I — ${rapi.I.name}</span>
-                <span class="rapi-dim-status ${rapi.I.statusClass === 'strong' ? 'rapi-status-strong' : rapi.I.statusClass === 'moderate' ? 'rapi-status-moderate' : 'rapi-status-limited'}">
-                  ${rapi.I.status}
+                <span style="font-weight:700; color:var(--text-primary)">I — ${mappedRapi.I.name}</span>
+                <span class="rapi-dim-status ${mappedRapi.I.statusClass === 'strong' ? 'rapi-status-strong' : mappedRapi.I.statusClass === 'moderate' ? 'rapi-status-moderate' : 'rapi-status-limited'}">
+                  ${mappedRapi.I.status}
                 </span>
               </div>
-              <div style="font-size:12px; color:var(--text-secondary);">${rapi.I.description}</div>
+              <div style="font-size:12px; color:var(--text-secondary);">${mappedRapi.I.description}</div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 4 Dimensions Detailed Cards Grid -->
-      <div class="grid-4" style="margin-bottom: 24px;">
-        <!-- R Dimension Card -->
-        <div class="rapi-card rapi-r">
-          <div class="rapi-letter">R</div>
-          <div class="rapi-dim-name">${rapi.R.name}</div>
-          <div class="rapi-dim-desc">${rapi.R.description}</div>
-          <div>
-            <span class="rapi-dim-status ${rapi.R.statusClass === 'strong' ? 'rapi-status-strong' : rapi.R.statusClass === 'moderate' ? 'rapi-status-moderate' : 'rapi-status-limited'}">
-              ${rapi.R.status}
-            </span>
-          </div>
-          <div class="rapi-dim-basis">
-            <strong>Basis Bukti Transaksi:</strong><br>${rapi.R.basis}
-          </div>
-        </div>
-
-        <!-- A Dimension Card -->
-        <div class="rapi-card rapi-a">
-          <div class="rapi-letter">A</div>
-          <div class="rapi-dim-name">${rapi.A.name}</div>
-          <div class="rapi-dim-desc">${rapi.A.description}</div>
-          <div>
-            <span class="rapi-dim-status ${rapi.A.statusClass === 'strong' ? 'rapi-status-strong' : rapi.A.statusClass === 'moderate' ? 'rapi-status-moderate' : 'rapi-status-limited'}">
-              ${rapi.A.status}
-            </span>
-          </div>
-          <div class="rapi-dim-basis">
-            <strong>Basis Bukti Transaksi:</strong><br>${rapi.A.basis}
-          </div>
-        </div>
-
-        <!-- P Dimension Card -->
-        <div class="rapi-card rapi-p">
-          <div class="rapi-letter">P</div>
-          <div class="rapi-dim-name">${rapi.P.name}</div>
-          <div class="rapi-dim-desc">${rapi.P.description}</div>
-          <div>
-            <span class="rapi-dim-status ${rapi.P.statusClass === 'strong' ? 'rapi-status-strong' : rapi.P.statusClass === 'moderate' ? 'rapi-status-moderate' : 'rapi-status-limited'}">
-              ${rapi.P.status}
-            </span>
-          </div>
-          <div class="rapi-dim-basis">
-            <strong>Basis Bukti Transaksi:</strong><br>${rapi.P.basis}
-          </div>
-        </div>
-
-        <!-- I Dimension Card -->
-        <div class="rapi-card rapi-i">
-          <div class="rapi-letter">I</div>
-          <div class="rapi-dim-name">${rapi.I.name}</div>
-          <div class="rapi-dim-desc">${rapi.I.description}</div>
-          <div>
-            <span class="rapi-dim-status ${rapi.I.statusClass === 'strong' ? 'rapi-status-strong' : rapi.I.statusClass === 'moderate' ? 'rapi-status-moderate' : 'rapi-status-limited'}">
-              ${rapi.I.status}
-            </span>
-          </div>
-          <div class="rapi-dim-basis">
-            <strong>Basis Bukti Transaksi:</strong><br>${rapi.I.basis}
-          </div>
-        </div>
-      </div>
-
-      <!-- Evidence Layer Audit Architecture -->
-      <div class="evidence-card">
-        <div class="evidence-title">
-          <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 2L12.5 7.5H18L13.5 11L15.5 17L10 13.5L4.5 17L6.5 11L2 7.5H7.5L10 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-          Arsitektur & Keterverifikasian Evidence Layer
-        </div>
-        <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">
-          Setiap indikator dalam Profil Kesiapan RAPI didukung oleh rantai bukti digital (evidence trail) yang dapat diaudit langsung ke jejak transaksi asal:
-        </p>
-
-        <div class="evidence-items">
-          <div class="evidence-item">
-            <span style="font-weight:700;color:var(--primary)">1. Jejak Transaksi</span>
-            <span>QRIS, Transfer, Tunai, Faktur, Mutasi</span>
-          </div>
-          <div class="evidence-item">
-            <span style="font-weight:700;color:var(--info)">2. Mesin AI</span>
-            <span>Rekonsiliasi & Klasifikasi Berbasis Nilai Keyakinan</span>
-          </div>
-          <div class="evidence-item">
-            <span style="font-weight:700;color:var(--success)">3. Catatan Keuangan</span>
-            <span>Laba Rugi & Arus Kas Standar SAK EMKM</span>
-          </div>
-          <div class="evidence-item">
-            <span style="font-weight:700;color:var(--warning)">4. Verifikasi Analis</span>
-            <span>Human Validation di Pusat Review</span>
-          </div>
-          <div class="evidence-item">
-            <span style="font-weight:700;color:var(--rapi-r)">5. Kesiapan Pembiayaan</span>
-            <span>Profil Kesiapan Pembiayaan Objektif</span>
-          </div>
-        </div>
-
-        <div style="margin-top:20px;padding:16px;background:var(--card);border-radius:var(--radius);border:1px solid var(--border);">
-          <div style="font-size:13px;font-weight:600;margin-bottom:6px;">Kesimpulan Ringkas Analis (Analyst Takeaway)</div>
-          <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">
-            Subjek UMKM menunjukkan arus pendapatan teratur dengan kontribusi dominan melalui kanal digital (QRIS & Transfer). Catatan rekonsiliasi antar-rekening bersih dari anomali duplikasi. Profil kesiapan ini memberikan bahan baku yang dapat diverifikasi (verifiable evidence) bagi komite pembiayaan perbankan maupun fintech pendana.
-          </div>
-        </div>
-      </div>
     </div>
   `;
 }
 
 export function initRAPI() {
-  if (!state.demoLoaded || state.transactions.length === 0) return;
+  if (!state.demoLoaded || !state.rapiProfile) return;
 
-  const fin = calculateFinancials(state.transactions);
-  const comp = getInformationCompleteness(state.transactions);
-  const rapi = generateRAPIProfile(state.transactions, fin, comp);
-
-  createRAPIRadarChart('chart-rapi-radar', rapi);
+  const p = state.rapiProfile;
+  const mappedProfile = {
+      R: { value: getPseudoValue(p.revenue_stability.status) },
+      A: { value: getPseudoValue(p.cash_flow_consistency.status) },
+      P: { value: getPseudoValue(p.payment_behaviour.status) },
+      I: { value: getPseudoValue(p.information_completeness.status) }
+  };
+  createRAPIRadarChart('chart-rapi-radar', mappedProfile);
 }

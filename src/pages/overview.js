@@ -4,29 +4,75 @@
  */
 
 import { state, getReviewTransactions, getValidTransactions, formatCurrency, formatDate } from '../state.js';
-import { calculateFinancials, getRevenueTrend } from '../mock-engine.js';
-import { createRevenueTrendChart, createExpenseBreakdownChart } from '../charts.js';
+
+function renderEmptyState() {
+  return `
+    <div class="page">
+      <div class="page-header">
+        <div class="page-header-text">
+          <h2>Ikhtisar RAPI-SULTRA</h2>
+          <p>Transformasi jejak transaksi multi-kanal menjadi catatan keuangan terstruktur dan profil kesiapan pembiayaan UMKM.</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" id="btn-load-demo-overview" style="height: 42px;">
+            Muat Data Simulasi
+          </button>
+        </div>
+      </div>
+      <div class="empty-state" style="margin-top: 40px;">
+        <div class="empty-icon">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><path d="M18 10v16M10 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="empty-title">Belum ada data</div>
+        <div class="empty-subtitle">Klik tombol Muat Data Simulasi untuk mengambil data dari backend RAPI-SULTRA.</div>
+        <button class="btn btn-primary" id="btn-load-demo-empty" style="margin-top: 16px;">Muat Data Simulasi</button>
+      </div>
+    </div>
+  `;
+}
+
+function getStrengthClass(status) {
+  if (!status) return 'rapi-status-limited';
+  if (status.includes('HIGH') || status.includes('POSITIVE') || status.includes('COMPLETE')) return 'rapi-status-strong';
+  if (status.includes('MODERATE') || status.includes('OBSERVED')) return 'rapi-status-moderate';
+  return 'rapi-status-limited';
+}
+
+function getBadgeClass(status) {
+  switch (status) {
+    case 'AUTO_CLASSIFIED':
+    case 'READY':
+      return 'badge-success';
+    case 'VALIDATED':
+      return 'badge-info';
+    case 'REVIEW_REQUIRED':
+    case 'PENDING_REVIEW':
+      return 'badge-warning';
+    case 'POSSIBLE_DUPLICATE':
+      return 'badge-danger';
+    case 'RECONCILIATION_REVIEW':
+      return 'badge-warning';
+    default:
+      return 'badge-channel';
+  }
+}
 
 export function renderOverview() {
-  if (!state.demoLoaded || state.transactions.length === 0) {
+  if (!state.demoLoaded || state.transactions.length === 0 || !state.financialSummary) {
     return renderEmptyState();
   }
 
   const txns = state.transactions;
-  const valid = getValidTransactions();
-  const review = getReviewTransactions();
-  const fin = calculateFinancials(txns);
-  const autoClassified = txns.filter(t => t.review_status === 'AUTO_CLASSIFIED').length;
+  const fin = state.financialSummary;
+  const rapi = state.rapiProfile;
+  
+  const totalRevenue = fin.revenue || 0;
+  const totalExpenses = (fin.cogs || 0) + (fin.operating_expense || 0);
+  const netFinancing = (fin.financing_inflow || 0) - (fin.financing_outflow || 0);
+  
+  const reviewCount = getReviewTransactions().length;
+  const autoClassified = txns.length - reviewCount;
   const automationRate = txns.length > 0 ? Math.round((autoClassified / txns.length) * 100) : 0;
-
-  const totalRevenue = fin.revenue;
-  const totalExpenses = fin.cogs + fin.opex;
-
-  // Source counts
-  const sources = {};
-  ['QRIS', 'Transfer', 'Cash', 'Invoice', 'Bank Mutation'].forEach(ch => {
-    sources[ch] = txns.filter(t => t.channel === ch).length;
-  });
 
   // Recent transactions (last 8)
   const recent = [...txns].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 8);
@@ -39,12 +85,12 @@ export function renderOverview() {
           <p>Transformasi jejak transaksi multi-kanal menjadi catatan keuangan terstruktur dan profil kesiapan pembiayaan UMKM.</p>
         </div>
         <div class="page-actions">
-          <button class="btn btn-secondary" id="btn-add-txn-overview">
+          <button class="btn btn-secondary" id="btn-add-txn-overview" style="height: 42px;">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M8 2v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            Tambah Transaksi
+            Upload CSV Transaksi
           </button>
-          <button class="btn btn-primary" id="btn-load-demo-overview">
-            Muat Data Simulasi
+          <button class="btn btn-primary" id="btn-load-demo-overview" style="height: 42px;">
+            Muat Ulang Data Backend
           </button>
         </div>
       </div>
@@ -73,14 +119,14 @@ export function renderOverview() {
           </div>
           <div class="kpi-label">Total Beban Usaha</div>
           <div class="kpi-value" style="color:var(--danger)">${formatCurrency(totalExpenses)}</div>
-          <div class="kpi-sub">HPP (Bahan Baku) + Beban Operasional</div>
+          <div class="kpi-sub">HPP + Beban Operasional</div>
         </div>
         <div class="kpi-card kpi-financing">
           <div class="kpi-icon icon-financing">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 8h14" stroke="currentColor" stroke-width="1.5"/></svg>
           </div>
           <div class="kpi-label">Pembiayaan Bersih</div>
-          <div class="kpi-value" style="color:var(--info)">${formatCurrency(fin.netFinancing)}</div>
+          <div class="kpi-value" style="color:var(--info)">${formatCurrency(netFinancing)}</div>
           <div class="kpi-sub">Pencairan − Angsuran Pinjaman</div>
         </div>
         <div class="kpi-card kpi-review">
@@ -88,118 +134,148 @@ export function renderOverview() {
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v3M10 13h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           </div>
           <div class="kpi-label">Perlu Review</div>
-          <div class="kpi-value" style="color:${review.length > 0 ? 'var(--warning)' : 'var(--success)'}">${review.length}</div>
-          <div class="kpi-sub">${review.length > 0 ? 'Menunggu verifikasi analis' : 'Semua terverifikasi'}</div>
+          <div class="kpi-value" style="color:${reviewCount > 0 ? 'var(--warning)' : 'var(--success)'}">${reviewCount}</div>
+          <div class="kpi-sub">${reviewCount > 0 ? 'Menunggu verifikasi analis' : 'Semua terverifikasi'}</div>
         </div>
       </div>
 
-      <!-- AI Transaction Processing -->
+      <!-- AI Transaction Processing Overview -->
       <div class="section">
-        <div class="section-title"><span class="dot"></span> Pemrosesan Mesin Transaksi AI</div>
+        <div class="section-title"><span class="dot"></span> Pemrosesan Mesin Transaksi Backend</div>
         <div class="card">
           <div class="ai-processing">
             <div class="ai-stat">
-              <div class="ai-stat-value">${txns.length}</div>
-              <div class="ai-stat-label">Total Transaksi</div>
-            </div>
-            <div class="ai-stat">
-              <div class="ai-stat-value" style="color:var(--success)">${autoClassified}</div>
-              <div class="ai-stat-label">Otomatis Terklasifikasi (≥70%)</div>
-            </div>
-            <div class="ai-stat">
-              <div class="ai-stat-value" style="color:var(--warning)">${review.length}</div>
-              <div class="ai-stat-label">Perlu Review Analis (<70%)</div>
+              <div class="ai-stat-value">${automationRate}%</div>
+              <div class="ai-stat-label">Automation Rate</div>
             </div>
             <div class="ai-stat highlight">
-              <div class="ai-stat-value">${automationRate}%</div>
-              <div class="ai-stat-label">Tingkat Automasi AI</div>
+              <div class="ai-stat-value">${autoClassified} / ${txns.length}</div>
+              <div class="ai-stat-label">Auto-Classified</div>
+            </div>
+            <div class="ai-stat">
+              <div class="ai-stat-value">${reviewCount} / ${txns.length}</div>
+              <div class="ai-stat-label">Review Required</div>
+            </div>
+          </div>
+          <div class="mt-16 text-muted fs-13 text-center">
+            Status ini menunjukkan hasil pemrosesan backend pada dataset yang dimuat.
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Financial Summary -->
+        <div class="section">
+          <div class="section-title"><span class="dot" style="background:var(--success)"></span> Ringkasan Keuangan</div>
+          <div class="card" style="padding: 16px 24px;">
+            <div class="metric-row">
+              <span class="metric-label">Pendapatan Usaha</span>
+              <span class="metric-value positive">${formatCurrency(fin.revenue)}</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">HPP / COGS</span>
+              <span class="metric-value negative">${formatCurrency(fin.cogs)}</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">Beban Operasional</span>
+              <span class="metric-value negative">${formatCurrency(fin.operating_expense)}</span>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="metric-row">
+              <span class="metric-label">Laba Kotor</span>
+              <span class="metric-value ${fin.gross_profit >= 0 ? 'positive' : 'negative'}">${formatCurrency(fin.gross_profit)}</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">Arus Kas Bersih</span>
+              <span class="metric-value ${fin.net_cash_movement >= 0 ? 'positive' : 'negative'}">${formatCurrency(fin.net_cash_movement)}</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">Pembiayaan Masuk</span>
+              <span class="metric-value positive">${formatCurrency(fin.financing_inflow)}</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">Pembiayaan Keluar</span>
+              <span class="metric-value negative">${formatCurrency(fin.financing_outflow)}</span>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Charts Row -->
-      <div class="grid-2 section">
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Tren Pendapatan Bulanan</span>
+        <!-- RAPI Profile -->
+        <div class="section">
+          <div class="section-title"><span class="dot" style="background:var(--primary)"></span> RAPI Financing Readiness Profile</div>
+          <div class="grid-2">
+            <div class="rapi-card rapi-r" style="padding: 16px;">
+              <div class="rapi-dim-name">Revenue Stability</div>
+              <div class="rapi-dim-status ${getStrengthClass(rapi?.revenue_stability?.status)}">${(rapi?.revenue_stability?.status || 'N/A').replace(/_/g, ' ')}</div>
+            </div>
+            <div class="rapi-card rapi-a" style="padding: 16px;">
+              <div class="rapi-dim-name">Cash-flow Consistency</div>
+              <div class="rapi-dim-status ${getStrengthClass(rapi?.cash_flow_consistency?.status)}">${(rapi?.cash_flow_consistency?.status || 'N/A').replace(/_/g, ' ')}</div>
+            </div>
+            <div class="rapi-card rapi-p" style="padding: 16px;">
+              <div class="rapi-dim-name">Payment Behaviour</div>
+              <div class="rapi-dim-status ${getStrengthClass(rapi?.payment_behaviour?.status)}">${(rapi?.payment_behaviour?.status || 'N/A').replace(/_/g, ' ')}</div>
+            </div>
+            <div class="rapi-card rapi-i" style="padding: 16px;">
+              <div class="rapi-dim-name">Information Completeness</div>
+              <div class="rapi-dim-status ${getStrengthClass(rapi?.information_completeness?.status)}">${(rapi?.information_completeness?.status || 'N/A').replace(/_/g, ' ')}</div>
+            </div>
           </div>
-          <div class="chart-container">
-            <canvas id="chart-revenue-trend"></canvas>
+          <div class="evidence-disclaimer mt-16" style="margin-bottom: 0;">
+            RAPI Financing Readiness Profile merupakan profil deskriptif berbasis data yang tersedia dan bukan credit score atau keputusan pembiayaan.
           </div>
         </div>
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Komposisi Beban Usaha</span>
-          </div>
-          <div class="chart-container">
-            <canvas id="chart-expense-breakdown"></canvas>
-          </div>
-        </div>
       </div>
 
-      <!-- Transaction Sources -->
+      <!-- Recent Transactions Table -->
       <div class="section">
-        <div class="section-title"><span class="dot"></span> Distribusi Kanal Sumber Transaksi</div>
-        <div class="source-grid">
-          ${Object.entries(sources).map(([ch, count]) => {
-            const icons = { 'QRIS': '📱', 'Transfer': '🏦', 'Cash': '💵', 'Invoice': '📄', 'Bank Mutation': '📊' };
-            const indoChannel = ch === 'Cash' ? 'Tunai (Cash)' : ch === 'Transfer' ? 'Transfer Bank' : ch === 'Bank Mutation' ? 'Mutasi Bank' : ch;
-            return `
-              <div class="source-item">
-                <div class="source-icon">${icons[ch] || '📋'}</div>
-                <div class="source-label">${indoChannel}</div>
-                <div class="source-count">${count} transaksi</div>
-              </div>`;
-          }).join('')}
-        </div>
-      </div>
-
-      <!-- Recent Transactions -->
-      <div class="section">
-        <div class="section-title"><span class="dot"></span> Transaksi Terkini Lintas Kanal</div>
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Tanggal</th>
-                <th>Deskripsi Transaksi</th>
-                <th>Kanal</th>
-                <th>Kategori AI</th>
-                <th>Keyakinan</th>
-                <th>Status Verifikasi</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${recent.map(t => {
-                const label = t.validated_label || t.predicted_label;
-                const confClass = t.confidence >= 0.80 ? 'high' : t.confidence >= 0.70 ? 'medium' : 'low';
-                const statusClass = t.review_status === 'AUTO_CLASSIFIED' ? 'badge-auto' :
-                  t.review_status === 'VALIDATED' ? 'badge-validated' : 'badge-review';
-                const statusText = t.review_status === 'AUTO_CLASSIFIED' ? 'Otomatis' :
-                  t.review_status === 'VALIDATED' ? 'Tervalidasi' : 'Perlu Review';
-                return `
-                  <tr class="clickable" data-txn-id="${t.id}">
-                    <td>${formatDate(t.date)}</td>
-                    <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.description}</td>
-                    <td><span class="badge badge-channel">${t.channel}</span></td>
-                    <td>${label.replace(/_/g, ' ')}</td>
-                    <td>
-                      <div class="confidence-bar">
-                        <div class="confidence-track"><div class="confidence-fill ${confClass}" style="width:${t.confidence * 100}%"></div></div>
-                        <span class="confidence-value">${(t.confidence * 100).toFixed(1)}%</span>
-                      </div>
-                    </td>
-                    <td>
-                      <span class="badge ${statusClass}">
-                        <span class="badge-dot"></span>
-                        ${statusText}
-                      </span>
-                    </td>
-                  </tr>`;
-              }).join('')}
-            </tbody>
-          </table>
+        <div class="section-title"><span class="dot" style="background:var(--info)"></span> Jejak Transaksi Terbaru</div>
+        <div class="card p-0">
+          <div class="table-container table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>TANGGAL</th>
+                  <th>REFERENCE ID</th>
+                  <th>DESKRIPSI</th>
+                  <th>SUMBER</th>
+                  <th>NOMINAL</th>
+                  <th>KLASIFIKASI</th>
+                  <th>CONFIDENCE</th>
+                  <th>STATUS</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${recent.map(t => {
+                  return `
+                    <tr data-txn-id="${t.id}" class="clickable">
+                      <td>${formatDate(t.date).split(',')[0]}</td>
+                      <td class="fs-12 text-muted">#${t.referenceId || t.id.split('-')[0]}</td>
+                      <td>${t.description}</td>
+                      <td>${t.channel}</td>
+                      <td>
+                        <span class="${t.direction === 'IN' ? 'amount-in' : 'amount-out'}">
+                          ${t.direction === 'IN' ? '+' : '-'}${formatCurrency(t.amount)}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge badge-channel">${(t.predicted_label || t.financial_category || 'Other').replace(/_/g, ' ')}</span>
+                      </td>
+                      <td>
+                        ${t.confidence ? (t.confidence * 100).toFixed(1) + '%' : '-'}
+                      </td>
+                      <td>
+                        <span class="badge ${getBadgeClass(t.review_status)}">${(t.review_status || 'UNKNOWN').replace(/_/g, ' ')}</span>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+          <div style="padding: 16px 24px; text-align: center; border-top: 1px solid var(--border-light);">
+            <a href="#transactions" class="btn btn-secondary">Lihat Seluruh Buku Transaksi</a>
+          </div>
         </div>
       </div>
     </div>
@@ -207,47 +283,5 @@ export function renderOverview() {
 }
 
 export function initOverview() {
-  if (!state.demoLoaded || state.transactions.length === 0) return;
-
-  const fin = calculateFinancials(state.transactions);
-  const revTrend = getRevenueTrend(state.transactions);
-
-  if (revTrend.labels.length > 0) {
-    createRevenueTrendChart('chart-revenue-trend', revTrend);
-  }
-  if (fin.cogs > 0 || fin.opex > 0) {
-    createExpenseBreakdownChart('chart-expense-breakdown', fin.cogs, fin.opex);
-  }
-}
-
-function renderEmptyState() {
-  return `
-    <div class="page">
-      <div class="page-header">
-        <div class="page-header-text">
-          <h2>Ikhtisar RAPI-SULTRA</h2>
-          <p>Transformasi jejak transaksi multi-kanal menjadi catatan keuangan terstruktur dan profil kesiapan pembiayaan UMKM.</p>
-        </div>
-        <div class="page-actions">
-          <button class="btn btn-secondary" id="btn-add-txn-overview">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M8 2v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            Tambah Transaksi
-          </button>
-          <button class="btn btn-primary" id="btn-load-demo-overview">
-            Muat Data Simulasi
-          </button>
-        </div>
-      </div>
-      <div class="empty-state">
-        <div class="empty-icon">
-          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-            <path d="M18 6v24M6 18h24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="empty-title">Belum ada data transaksi yang dimuat.</div>
-        <div class="empty-subtitle">Muat dataset simulasi RAPI-SULTRA untuk mengeksplorasi alur lengkap transformasi transaksi ke profil kesiapan pembiayaan.</div>
-        <button class="btn btn-primary" id="btn-load-demo-empty">Muat Data Simulasi</button>
-      </div>
-    </div>
-  `;
+  // Init not needed for overview currently
 }

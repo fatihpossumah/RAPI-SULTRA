@@ -81,63 +81,7 @@ export function createRevenueTrendChart(canvasId, data) {
   });
 }
 
-/**
- * Cash Flow Trend (Inflow vs Outflow)
- */
-export function createCashFlowChart(canvasId, data) {
-  destroyChart(canvasId);
-  const ctx = document.getElementById(canvasId);
-  if (!ctx) return;
 
-  chartInstances[canvasId] = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: data.labels,
-      datasets: [
-        {
-          label: 'Arus Masuk (Inflow)',
-          data: data.inflow,
-          backgroundColor: 'rgba(22, 163, 74, 0.7)',
-          borderRadius: 4,
-          barPercentage: 0.7,
-        },
-        {
-          label: 'Arus Keluar (Outflow)',
-          data: data.outflow.map(v => v),
-          backgroundColor: 'rgba(220, 38, 38, 0.7)',
-          borderRadius: 4,
-          barPercentage: 0.7,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'top' },
-        tooltip: {
-          backgroundColor: '#0B1F3A',
-          padding: 12,
-          cornerRadius: 8,
-          callbacks: {
-            label: (ctx) => ctx.dataset.label + ': Rp' + ctx.parsed.y.toLocaleString('id-ID'),
-          },
-        },
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: (v) => v >= 1000000 ? (v / 1000000).toFixed(1) + ' jt' : v >= 1000 ? (v / 1000) + ' rb' : v,
-          },
-        },
-        x: {
-          grid: { display: false },
-        },
-      },
-    },
-  });
-}
 
 /**
  * Expense Breakdown Doughnut
@@ -265,7 +209,7 @@ export function createRAPIRadarChart(canvasId, profile) {
           padding: 12,
           cornerRadius: 8,
           callbacks: {
-            label: (ctx) => `${ctx.label}: ${ctx.parsed.r}/100`,
+            label: (ctx) => `${ctx.label} (Level Indikatif)`,
           },
         },
       },

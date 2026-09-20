@@ -166,7 +166,7 @@ function renderReconciliation() {
       <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
         Pasangan transaksi lintas kanal yang memiliki kecocokan nominal dan waktu yang sama, membuktikan alur mutasi dana riil:
       </p>
-      ${pairs.map(pair => `
+      ${pairs.filter(p => p.transactionA && p.transactionB).map(pair => `
         <div class="recon-pair">
           <div class="recon-txn">
             <div class="recon-txn-channel">${pair.transactionA.channel}</div>
@@ -210,7 +210,7 @@ function renderDuplicates() {
       <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
         Transaksi yang terdeteksi memiliki kemiripan tinggi. Tentukan keputusan analis tanpa menghapus catatan asal:
       </p>
-      ${dupes.map(dup => `
+      ${dupes.filter(d => d.transactionA && d.transactionB).map(dup => `
         <div class="dup-card" id="dup-${dup.id}">
           <div class="dup-header">
             <span style="font-size:13px;font-weight:600">${dup.id}</span>

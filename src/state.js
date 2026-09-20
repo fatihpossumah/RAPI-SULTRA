@@ -7,6 +7,10 @@ const listeners = [];
 
 export const state = {
   transactions: [],
+  financialSummary: null,
+  rapiProfile: null,
+  validation: null,
+  monthlySummary: null,
   currentPage: 'overview',
   demoLoaded: false,
   selectedTransaction: null,
@@ -65,12 +69,16 @@ export function getFilteredTransactions() {
 }
 
 export function getReviewTransactions() {
-  return state.transactions.filter(t => t.review_status === 'REVIEW_REQUIRED');
+  return state.transactions.filter(t => {
+    if (t.reconciliation_status === 'RECONCILED') return false;
+    if (t.duplicate_status === 'EXACT_DUPLICATE' || t.duplicate_status === 'POSSIBLE_DUPLICATE') return false;
+    return t.review_status === 'REVIEW_REQUIRED' || t.review_status === 'PENDING_REVIEW';
+  });
 }
 
 export function getValidTransactions() {
   return state.transactions.filter(t =>
-    t.review_status === 'AUTO_CLASSIFIED' || t.review_status === 'VALIDATED'
+    t.review_status === 'AUTO_CLASSIFIED' || t.review_status === 'VALIDATED' || t.review_status === 'READY'
   );
 }
 
