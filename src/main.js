@@ -3,7 +3,7 @@
  * Router, Integrasi State, dan Penanganan Event (Bahasa Indonesia)
  */
 
-import { state, updateState, subscribe, getReviewTransactions, formatCurrency, formatDate } from './state.js';
+import { state, updateState, subscribe, getReviewTransactions, formatCurrency, formatDate, restoreState, recalculateAll, persistState, validateTransaction, clearPersistedState } from './state.js';
 import { fetchSummary, fetchTransactions, fetchDuplicates, fetchReconciliation, uploadCSV } from './api.js';
 import {
   showToast,
@@ -88,11 +88,21 @@ function updateReviewBadge() {
 /**
  * Aksi Pemuatan Data Demo Simulasi dari Backend API
  */
-async function handleLoadDemoData() {
+async function handleLoadDemoData(force = false) {
+  if (force) {
+    clearPersistedState();
+  }
+
+  // Cek apakah ada state yang tersimpan di localStorage
+  if (!force && restoreState()) {
+    showToast('Data sesi berhasil dipulihkan dari browser.', 'success');
+    navigate();
+    return;
+  }
+
   showToast('Mengambil data dari backend...', 'info');
 
   try {
-    const summaryData = await fetchSummary();
     const txnsData = await fetchTransactions();
     const dupData = await fetchDuplicates();
     const reconData = await fetchReconciliation();
@@ -122,16 +132,16 @@ async function handleLoadDemoData() {
       return formatted;
     };
 
-    updateState({
-      transactions: txnsData.transactions,
-      reconciliationPairs: formatPairs(reconData.reconciliation_matches, 'reconciliation_group_id'),
-      duplicatePairs: formatPairs(dupData.duplicate_candidates, 'duplicate_group_id'),
-      financialSummary: summaryData.financial_summary,
-      rapiProfile: summaryData.rapi_profile,
-      validation: summaryData.validation,
-      monthlySummary: summaryData.monthly_summary,
-      demoLoaded: true,
-    });
+    state.transactions = txnsData.transactions;
+    state.reconciliationPairs = formatPairs(reconData.reconciliation_matches, 'reconciliation_group_id');
+    state.duplicatePairs = formatPairs(dupData.duplicate_candidates, 'duplicate_group_id');
+    state.demoLoaded = true;
+
+    // Lakukan komputasi ulang (recalculate) secara lokal menggunakan frontend engine
+    recalculateAll();
+    
+    // Simpan state awal ke localStorage
+    persistState();
 
     showToast(`Berhasil memuat ${txnsData.transactions.length} transaksi dari backend RAPI-SULTRA!`, 'success');
     navigate();
@@ -207,6 +217,7 @@ function attachPageEventListeners() {
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
       state.filters.search = e.target.value;
+      state.pagination.currentPage = 1;
       navigate();
       const newInput = document.getElementById('txn-search');
       if (newInput) {
@@ -223,6 +234,28 @@ function attachPageEventListeners() {
       select.addEventListener('change', (e) => {
         const filterKey = id.replace('filter-', '');
         state.filters[filterKey] = e.target.value;
+        state.pagination.currentPage = 1;
+        navigate();
+      });
+    }
+  });
+
+  // Filter tanggal dan page size (Transactions & Review)
+  ['filter-start-date', 'filter-end-date', 'filter-page-size', 'review-page-size'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('change', (e) => {
+        if (id === 'filter-page-size') {
+          state.pagination.pageSize = parseInt(e.target.value, 10) || 10;
+          state.pagination.currentPage = 1;
+        } else if (id === 'review-page-size') {
+          state.reviewPagination.pageSize = parseInt(e.target.value, 10) || 10;
+          state.reviewPagination.currentPage = 1;
+        } else {
+          const filterKey = id === 'filter-start-date' ? 'startDate' : 'endDate';
+          state.filters[filterKey] = e.target.value;
+          state.pagination.currentPage = 1;
+        }
         navigate();
       });
     }
@@ -252,13 +285,44 @@ document.addEventListener('click', (e) => {
 
   // 2. Tombol Muat Data Demo
   if (e.target.closest('#btn-load-demo-overview') || e.target.closest('#btn-load-demo-empty')) {
-    handleLoadDemoData();
+    handleLoadDemoData(true);
     return;
   }
 
   // 3. Tombol Tambah Transaksi
   if (e.target.closest('#btn-add-txn-overview') || e.target.closest('#btn-add-txn-page')) {
     handleOpenAddTransaction();
+    return;
+  }
+
+  // 3.1 Pagination (Transactions)
+  const pageBtn = e.target.closest('.page-btn');
+  if (pageBtn && !pageBtn.disabled) {
+    const page = parseInt(pageBtn.getAttribute('data-page'));
+    if (!isNaN(page)) {
+      if (state.currentPage === 'review') {
+        state.reviewPagination.currentPage = page;
+      } else {
+        state.pagination.currentPage = page;
+      }
+      navigate();
+    }
+    return;
+  }
+
+  // 3.2 Reset Filter
+  if (e.target.closest('#btn-reset-filters')) {
+    state.filters = {
+      search: '',
+      channel: 'all',
+      category: 'all',
+      status: 'all',
+      direction: 'all',
+      startDate: '',
+      endDate: '',
+    };
+    state.pagination.currentPage = 1;
+    navigate();
     return;
   }
 
@@ -288,14 +352,9 @@ document.addEventListener('click', (e) => {
     const select = document.getElementById(`select-category-${txnId}`);
     const chosenCategory = select ? select.value : 'Revenue';
 
-    const txn = state.transactions.find(t => t.id === txnId);
-    if (txn) {
-      txn.validated_label = chosenCategory;
-      txn.review_status = 'VALIDATED';
-      showToast(`Tersimpan lokal: Transaksi divalidasi sebagai ${chosenCategory.replace(/_/g, ' ')} (Sistem simpan backend belum terhubung)`, 'success');
-      updateState({ transactions: [...state.transactions] });
-      navigate();
-    }
+    validateTransaction(txnId, chosenCategory);
+    showToast(`Transaksi divalidasi sebagai ${chosenCategory.replace(/_/g, ' ')}`, 'success');
+    navigate();
     return;
   }
 
@@ -303,15 +362,15 @@ document.addEventListener('click', (e) => {
   if (e.target.closest('#btn-batch-validate')) {
     let count = 0;
     state.transactions.forEach(t => {
-      if (t.review_status === 'REVIEW_REQUIRED' || t.review_status === 'PENDING_REVIEW') {
-        t.validated_label = t.predicted_label;
-        t.review_status = 'VALIDATED';
+      // Sama seperti logika engine
+      const isPending = t.review_status === 'REVIEW_REQUIRED' || t.review_status === 'PENDING_REVIEW' || t.predicted_label === 'Other' || t.predicted_label === 'Unknown';
+      if (isPending) {
+        validateTransaction(t.id, t.predicted_label);
         count++;
       }
     });
     if (count > 0) {
-      showToast(`Tersimpan lokal: Berhasil memvalidasi ${count} transaksi sekaligus! (Backend belum terhubung)`, 'success');
-      updateState({ transactions: [...state.transactions] });
+      showToast(`Berhasil memvalidasi ${count} transaksi!`, 'success');
       navigate();
     }
     return;
@@ -359,3 +418,19 @@ if (!state.demoLoaded) {
 
 // Panggilan Inisialisasi Pertama
 navigate();
+
+// --- Splash Screen Logic ---
+window.addEventListener('DOMContentLoaded', () => {
+  const splash = document.getElementById('splash-screen');
+  if (splash) {
+    // Show splash for 3.5 seconds, then fade out
+    setTimeout(() => {
+      splash.classList.add('hidden');
+      
+      // Remove from DOM after CSS transition completes
+      setTimeout(() => {
+        splash.remove();
+      }, 600);
+    }, 3500);
+  }
+});

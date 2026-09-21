@@ -317,7 +317,7 @@ export function getTransactionDrawerHTML(txn, formatCurrency, formatDate) {
       </div>
 
       ${txn.review_status === 'REVIEW_REQUIRED' ? `
-      <div style="margin-top:20px;padding:14px;background:var(--warning-bg);border-radius:var(--radius);border:1px solid rgba(245,158,11,0.2)">
+      <div style="margin-top:20px;padding:14px;background:var(--warning-bg);border-radius:var(--radius);border:1px solid rgba(217, 119, 6, 0.3)">
         <div style="font-size:12px;font-weight:600;color:#B45309;margin-bottom:4px">⚠ Memerlukan Review Analis</div>
         <div style="font-size:12px;color:var(--text-secondary);line-height:1.5;">
           Skor keyakinan model di bawah ambang batas 0.70. Buka halaman Pusat Review untuk menetapkan kategori akuntansi yang tepat.
