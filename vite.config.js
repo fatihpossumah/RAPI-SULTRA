@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+  base: '/RAPI-SULTRA/',
   root: '.',
   server: {
     port: 3000,
