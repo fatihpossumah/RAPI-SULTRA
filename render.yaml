@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: rapi-sultra-api
+    runtime: python
+    buildCommand: ""
+    startCommand: python src/api.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9

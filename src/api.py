@@ -4,7 +4,7 @@ import csv
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
 
-PORT = 8000
+PORT = int(os.environ.get("PORT", 8000))
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPORTS_DIR = os.path.join(BASE_DIR, "reports", "presentation")
 
@@ -126,7 +126,7 @@ class RapiRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
 def run(server_class=HTTPServer, handler_class=RapiRequestHandler):
-    server_address = ('', PORT)
+    server_address = ('0.0.0.0', PORT)
     httpd = server_class(server_address, handler_class)
     print(f"Starting RAPI-SULTRA API Server on port {PORT}...")
     httpd.serve_forever()
