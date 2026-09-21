@@ -5,6 +5,57 @@
 
 import { state, getFilteredTransactions, formatCurrency, formatDate } from '../state.js';
 
+function getIndonesianCategory(label, direction, status) {
+  if (!label) {
+    return (status === 'REVIEW_REQUIRED' || status === 'PENDING_REVIEW') ? 'Perlu Diperiksa' : 'Belum Dikategorikan';
+  }
+  const l = label.toUpperCase();
+  if (l === 'REVENUE') return 'Pendapatan Usaha';
+  if (l === 'COGS') return 'Biaya Barang dan Bahan';
+  if (l === 'OPERATING_EXPENSE') return 'Biaya Operasional';
+  if (l === 'FINANCING') {
+    if (direction === 'IN') return 'Dana Pembiayaan Masuk';
+    if (direction === 'OUT') return 'Pembayaran Pembiayaan';
+    return 'Pembiayaan';
+  }
+  if (l === 'TRANSFER_INTERNAL') return 'Pindah Dana Antar Rekening';
+  if (l === 'OTHER') {
+    return (status === 'REVIEW_REQUIRED' || status === 'PENDING_REVIEW') ? 'Perlu Diperiksa' : 'Belum Dikategorikan';
+  }
+  return label.replace(/_/g, ' ');
+}
+
+function getCategoryBadgeClass(label, status) {
+  if (!label) return 'badge-channel';
+  const l = label.toUpperCase();
+  if (l === 'REVENUE') return 'badge-success'; 
+  if (l === 'COGS' || l === 'OPERATING_EXPENSE') return 'badge-danger';
+  if (l === 'FINANCING') return 'badge-info'; 
+  if (l === 'TRANSFER_INTERNAL') return 'badge-channel'; 
+  if (l === 'OTHER' || status === 'REVIEW_REQUIRED') return 'badge-warning'; 
+  return 'badge-channel';
+}
+
+function getIndonesianStatus(status) {
+  if (!status) return 'TIDAK DIKETAHUI';
+  const mapping = {
+    'AUTO_CLASSIFIED': 'Diproses Otomatis',
+    'REVIEW_REQUIRED': 'Perlu Diperiksa',
+    'VALIDATED': 'Tervalidasi',
+    'PENDING_REVIEW': 'Perlu Diperiksa',
+    'POSSIBLE_DUPLICATE': 'Kemungkinan Ganda',
+    'RECONCILIATION_REVIEW': 'Perlu Rekonsiliasi'
+  };
+  return mapping[status] || status.replace(/_/g, ' ');
+}
+
+function getPaginationArray(current, total) {
+  if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+  if (current <= 4) return [1, 2, 3, 4, 5, '...', total];
+  if (current >= total - 3) return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+  return [1, '...', current - 1, current, current + 1, '...', total];
+}
+
 export function renderTransactions() {
   if (!state.demoLoaded || state.transactions.length === 0) {
     return `
@@ -60,39 +111,59 @@ export function renderTransactions() {
 }
 
 function renderAllTransactions(txns) {
+  const pageSize = state.pagination?.pageSize || 10;
+  const currentPage = state.pagination?.currentPage || 1;
+  const totalItems = txns.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalItems);
+  const paginatedTxns = txns.slice(startIndex, endIndex);
+
   return `
     <!-- Filters -->
-    <div class="filters-bar">
-      <input type="text" class="search-input" id="txn-search" placeholder="Cari transaksi, deskripsi, ref..."
-        value="${state.filters.search}" />
-      <select class="filter-select" id="filter-channel">
-        <option value="all" ${state.filters.channel === 'all' ? 'selected' : ''}>Semua Kanal</option>
-        <option value="QRIS" ${state.filters.channel === 'QRIS' ? 'selected' : ''}>QRIS</option>
-        <option value="Transfer" ${state.filters.channel === 'Transfer' ? 'selected' : ''}>Transfer Bank</option>
-        <option value="Cash" ${state.filters.channel === 'Cash' ? 'selected' : ''}>Tunai (Cash)</option>
-        <option value="Invoice" ${state.filters.channel === 'Invoice' ? 'selected' : ''}>Invoice / Nota</option>
-        <option value="Bank Mutation" ${state.filters.channel === 'Bank Mutation' ? 'selected' : ''}>Mutasi Bank</option>
-      </select>
-      <select class="filter-select" id="filter-category">
-        <option value="all" ${state.filters.category === 'all' ? 'selected' : ''}>Semua Kategori</option>
-        <option value="Revenue" ${state.filters.category === 'Revenue' ? 'selected' : ''}>Revenue (Pendapatan Usaha)</option>
-        <option value="COGS" ${state.filters.category === 'COGS' ? 'selected' : ''}>COGS (HPP / Bahan Baku)</option>
-        <option value="Operating_Expense" ${state.filters.category === 'Operating_Expense' ? 'selected' : ''}>Operating Expense (Beban Operasi)</option>
-        <option value="Financing" ${state.filters.category === 'Financing' ? 'selected' : ''}>Financing (Pembiayaan)</option>
-        <option value="Transfer_Internal" ${state.filters.category === 'Transfer_Internal' ? 'selected' : ''}>Transfer Internal</option>
-        <option value="Other" ${state.filters.category === 'Other' ? 'selected' : ''}>Lain-lain (Other)</option>
-      </select>
-      <select class="filter-select" id="filter-status">
-        <option value="all" ${state.filters.status === 'all' ? 'selected' : ''}>Semua Status</option>
-        <option value="AUTO_CLASSIFIED" ${state.filters.status === 'AUTO_CLASSIFIED' ? 'selected' : ''}>Otomatis (≥70%)</option>
-        <option value="REVIEW_REQUIRED" ${state.filters.status === 'REVIEW_REQUIRED' ? 'selected' : ''}>Perlu Review (<70%)</option>
-        <option value="VALIDATED" ${state.filters.status === 'VALIDATED' ? 'selected' : ''}>Tervalidasi Analis</option>
-      </select>
-      <select class="filter-select" id="filter-direction">
-        <option value="all" ${state.filters.direction === 'all' ? 'selected' : ''}>Semua Arah Dana</option>
-        <option value="IN" ${state.filters.direction === 'IN' ? 'selected' : ''}>IN (Pemasukan)</option>
-        <option value="OUT" ${state.filters.direction === 'OUT' ? 'selected' : ''}>OUT (Pengeluaran)</option>
-      </select>
+    <div class="filters-bar" style="align-items: center; justify-content: space-between;">
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; flex: 1; align-items: center;">
+        <input type="text" class="search-input" id="txn-search" placeholder="Cari transaksi, deskripsi, ref..."
+          value="${state.filters.search || ''}" style="min-width: 200px;" />
+          
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <label style="font-size: 13px; color: var(--text-secondary); font-weight: 500;" for="filter-start-date">Mulai:</label>
+          <input type="date" class="date-input" id="filter-start-date" value="${state.filters.startDate || ''}" />
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <label style="font-size: 13px; color: var(--text-secondary); font-weight: 500;" for="filter-end-date">Akhir:</label>
+          <input type="date" class="date-input" id="filter-end-date" value="${state.filters.endDate || ''}" />
+        </div>
+        
+        <select class="filter-select" id="filter-category">
+          <option value="all" ${state.filters.category === 'all' ? 'selected' : ''}>Semua Kategori</option>
+          <option value="Revenue" ${state.filters.category === 'Revenue' ? 'selected' : ''}>Pendapatan Usaha</option>
+          <option value="COGS" ${state.filters.category === 'COGS' ? 'selected' : ''}>Biaya Barang dan Bahan</option>
+          <option value="Operating_Expense" ${state.filters.category === 'Operating_Expense' ? 'selected' : ''}>Biaya Operasional</option>
+          <option value="Financing" ${state.filters.category === 'Financing' ? 'selected' : ''}>Pembiayaan</option>
+          <option value="Transfer_Internal" ${state.filters.category === 'Transfer_Internal' ? 'selected' : ''}>Pindah Dana</option>
+          <option value="Other" ${state.filters.category === 'Other' ? 'selected' : ''}>Lain-lain</option>
+        </select>
+        
+        <button class="btn btn-secondary btn-sm" id="btn-reset-filters">Reset</button>
+      </div>
+    </div>
+
+    <!-- Summary & Page Size -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+      <div style="font-size: 13px; color: var(--text-secondary);">
+        Menampilkan ${totalItems === 0 ? 0 : startIndex + 1}–${endIndex} dari ${totalItems} transaksi
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 13px; color: var(--text-secondary);">Tampilkan:</span>
+        <select class="filter-select" id="filter-page-size" style="padding: 6px 12px; min-width: 60px; font-size: 13px;">
+          <option value="10" ${pageSize === 10 ? 'selected' : ''}>10</option>
+          <option value="25" ${pageSize === 25 ? 'selected' : ''}>25</option>
+          <option value="50" ${pageSize === 50 ? 'selected' : ''}>50</option>
+          <option value="100" ${pageSize === 100 ? 'selected' : ''}>100</option>
+        </select>
+      </div>
     </div>
 
     <!-- Table -->
@@ -101,25 +172,23 @@ function renderAllTransactions(txns) {
         <thead>
           <tr>
             <th>Tanggal</th>
-            <th>Deskripsi Transaksi</th>
-            <th>Kanal</th>
+            <th>Deskripsi</th>
+            <th>Sumber / Channel</th>
             <th>Arah</th>
             <th>Nominal</th>
-            <th>Kategori AI</th>
-            <th>Keyakinan</th>
-            <th>Status Verifikasi</th>
+            <th>Klasifikasi</th>
+            <th>Tingkat Keyakinan</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
-          ${txns.length === 0 ? `
-            <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted)">Tidak ada transaksi yang cocok dengan filter pencarian.</td></tr>
-          ` : txns.map(t => {
+          ${paginatedTxns.length === 0 ? `
+            <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted)">Tidak ada transaksi pada periode atau kriteria yang dipilih.</td></tr>
+          ` : paginatedTxns.map(t => {
             const label = t.validated_label || t.predicted_label;
             const confClass = t.confidence >= 0.80 ? 'high' : t.confidence >= 0.70 ? 'medium' : 'low';
             const statusClass = t.review_status === 'AUTO_CLASSIFIED' ? 'badge-auto' :
               t.review_status === 'VALIDATED' ? 'badge-validated' : 'badge-review';
-            const statusText = t.review_status === 'AUTO_CLASSIFIED' ? 'Otomatis' :
-              t.review_status === 'VALIDATED' ? 'Tervalidasi' : 'Perlu Review';
             return `
               <tr class="clickable" data-txn-id="${t.id}">
                 <td style="white-space:nowrap">${formatDate(t.date)}</td>
@@ -129,7 +198,11 @@ function renderAllTransactions(txns) {
                 <td class="${t.direction === 'IN' ? 'amount-in' : 'amount-out'}" style="white-space:nowrap">
                   ${t.direction === 'IN' ? '+' : '-'}${formatCurrency(t.amount)}
                 </td>
-                <td>${label.replace(/_/g, ' ')}</td>
+                <td>
+                  <span class="badge ${getCategoryBadgeClass(label, t.review_status)}">
+                    ${getIndonesianCategory(label, t.direction, t.review_status)}
+                  </span>
+                </td>
                 <td>
                   <div class="confidence-bar">
                     <div class="confidence-track"><div class="confidence-fill ${confClass}" style="width:${t.confidence * 100}%"></div></div>
@@ -139,7 +212,7 @@ function renderAllTransactions(txns) {
                 <td>
                   <span class="badge ${statusClass}">
                     <span class="badge-dot"></span>
-                    ${statusText}
+                    ${getIndonesianStatus(t.review_status)}
                   </span>
                 </td>
               </tr>`;
@@ -147,6 +220,21 @@ function renderAllTransactions(txns) {
         </tbody>
       </table>
     </div>
+
+    <!-- Pagination -->
+    ${totalPages > 1 ? `
+    <div style="display: flex; justify-content: center; gap: 4px; margin-top: 20px;">
+      <button class="btn btn-secondary page-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled style="opacity: 0.5; cursor: not-allowed"' : ''}>&lt; Prev</button>
+      
+      ${getPaginationArray(currentPage, totalPages).map(p => 
+        p === '...' 
+          ? `<span style="padding: 9px 12px; color: var(--text-secondary);">...</span>`
+          : `<button class="btn ${p === currentPage ? 'btn-primary' : 'btn-secondary'} page-btn" data-page="${p}">${p}</button>`
+      ).join('')}
+      
+      <button class="btn btn-secondary page-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled style="opacity: 0.5; cursor: not-allowed"' : ''}>Next &gt;</button>
+    </div>
+    ` : ''}
   `;
 }
 
